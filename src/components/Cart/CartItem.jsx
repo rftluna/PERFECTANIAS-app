@@ -51,7 +51,7 @@ export const CartItem = ({ item }) => {
                     className="btn bg-delete primary"
                     onClick={() => removeItem(item.id)}
                 >
-                    Eliminar Item
+                    Eliminar item
                 </button>
             </div>
         </Item>

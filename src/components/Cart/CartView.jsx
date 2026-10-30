@@ -9,7 +9,7 @@ export const CartView = () => {
 
   return (
     <section className="cart-container">
-      <h1>🛒 Tu carrito de compras 🛒</h1>
+      <h1> Tu Reserva 📝📌</h1>
  
       {cart.length ? (
         <>

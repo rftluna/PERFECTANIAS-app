@@ -14,7 +14,7 @@ export const Nav = () => {
                 </li>
                 <li>
                     <Link to={"/cart"}>
-                        🛒Carrito 🛒
+                        Tu Reserva 📝📌
                         {totalItems > 0 && (
                             <span className="incart">{totalItems}</span>
                         )}

@@ -13,12 +13,13 @@ import { getAuth } from "firebase/auth";
 //👉A futuro lo reemplazarían por variables de entorno y archivo .env😉
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBeZdCov9etJAaz-qN41BISRyNXtFI_gLY",
-    authDomain: "c26242-9311b.firebaseapp.com",
-    projectId: "c26242-9311b",
-    storageBucket: "c26242-9311b.firebasestorage.app",
-    messagingSenderId: "334726415504",
-    appId: "1:334726415504:web:3bbfda27bb84b6a0570415"
+    apiKey: "AIzaSyB99dOmxeHytPEIVPHGLPfAv_115JoHX9A",
+    authDomain: "perfectanias-app.firebaseapp.com",
+    projectId: "perfectanias-app",
+    storageBucket: "perfectanias-app.firebasestorage.app",
+    messagingSenderId: "580534903118",
+    appId: "1:580534903118:web:d970b5a7db58a30bf73e1f",
+    measurementId: "G-2DCZ1KJ4MM"
 };
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
