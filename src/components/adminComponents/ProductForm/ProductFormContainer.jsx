@@ -78,14 +78,14 @@ export const ProductFormContainer = () => {
             return;
         }
 
-        try { 
+        try {
             let imageUrl = product.image;
 
             // Si el usuario seleccionó una nueva imagen al editar o crear, la subimos
             if (file) {
-                imageUrl = await uploadImage(file);  //subir la imagen, con el retorno de imgBB (nueva URL)
+                imageUrl = await uploadImage(file); //subir la imagen, con el retorno de imgBB (nueva URL)
             }
-            
+
             // armar el producto completo
             const productData = {
                 ...product,
@@ -93,7 +93,7 @@ export const ProductFormContainer = () => {
                 image: imageUrl
             };
 
-            if (id) { 
+            if (id) {
                 // MODO EDICIÓN: Actualizamos el documento existente en la colección correcta
                 const docRef = doc(db, "turnos de servicios", id);
                 await updateDoc(docRef, productData);
