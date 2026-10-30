@@ -21,7 +21,7 @@ export const HORARIOS = ["08:00", "09:30", "11:00", "12:30", "14:00", "15:30", "
 // Función asincrónica para traer los servicios desde Firestore
 export const getServiciosFromDB = async () => {
     try {
-        const querySnapshot = await getDocs(collection(db, "servicios")); // Asegúrate de que tu colección en Firestore se llame exactamente "servicios"
+        const querySnapshot = await getDocs(collection(db, "turnos de servicios")); // Asegúrate de que tu colección en Firestore se llame exactamente "servicios"
         const serviciosList = querySnapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data()
