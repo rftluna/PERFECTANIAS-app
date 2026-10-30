@@ -11,7 +11,7 @@ export const ItemDetail = ({ item }) => {
           className="btn bg-primary primary"
           onClick={() => addItem(item)}
         >
-          Agregar al carrito
+          Agregar servicio
         </button>
       </Item>
     </div>

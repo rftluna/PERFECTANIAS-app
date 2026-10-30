@@ -10,7 +10,8 @@ export const ProductAdminListContainer = () => {
 
     const fetchProducts = async () => {
         try {
-            const querySnapshot = await getDocs(collection(db, "products"));
+            // Apuntamos a la colección exacta que tienes en Firestore: "turnos de servicios"
+            const querySnapshot = await getDocs(collection(db, "turnos de servicios"));
             const list = querySnapshot.docs.map((doc) => ({
                 id: doc.id,
                 ...doc.data()
@@ -30,7 +31,8 @@ export const ProductAdminListContainer = () => {
     const handleDelete = async (id) => {
         if (window.confirm("¿Estás seguro de que deseas eliminar este producto?")) {
             try {
-                await deleteDoc(doc(db, "products", id));
+                // Eliminamos el documento apuntando a la colección correcta
+                await deleteDoc(doc(db, "turnos de servicios", id));
                 setProducts(products.filter((prod) => prod.id !== id));
             } catch (error) {
                 console.error("Error al eliminar el producto: ", error);
