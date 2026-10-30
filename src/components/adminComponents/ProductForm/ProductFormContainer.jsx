@@ -9,12 +9,12 @@ import { createProduct } from "../../../services/productsService";
 import "./ProductFormContainer.css";
 
 /*------------------------------------------------------------------------------*/
-/*----------            EDITAR el utils/validateProduct.js         -------------*/
+/*----------          EDITAR el utils/validateProduct.js              -------------*/
 /*------------------------------------------------------------------------------*/
 
-//En el caso de utilizar este formulario con doble uso (carga y edicion) el archivo que valida las entradas
+// En el caso de utilizar este formulario con doble uso (carga y edicion) el archivo que valida las entradas
 // del producto deberia evaluar el caso de la imagen existente.
-//Evalua file, para la carga de foto nueva y product.image cuande viene de DB
+// Evalua file, para la carga de foto nueva y product.image cuando viene de DB
 
 export const ProductFormContainer = () => {
     const navigate = useNavigate();
@@ -37,7 +37,8 @@ export const ProductFormContainer = () => {
             const fetchProductToEdit = async () => {
                 try {
                     setLoading(true);
-                    const docRef = doc(db, "products", id);
+                    // CORREGIDO: Apuntamos a la colección correcta "turnos de servicios"
+                    const docRef = doc(db, "turnos de servicios", id);
                     const docSnap = await getDoc(docRef);
                     if (docSnap.exists()) {
                         setProduct(docSnap.data());
@@ -69,7 +70,7 @@ export const ProductFormContainer = () => {
         setErrors({});
         setLoading(true);
 
-        // Validar inputs (si estás editando y no cambias la imagen, puedes ajustar tu validador si es necesario)
+        // Validar inputs
         const newErrors = validateProduct({ ...product, file });
         if (Object.keys(newErrors).length > 0 && !id) {
             setErrors(newErrors);
@@ -77,13 +78,14 @@ export const ProductFormContainer = () => {
             return;
         }
 
-        try { //Ahora maneja 2 casos: nuevo y edit. La imagen puede existir
+        try { 
             let imageUrl = product.image;
 
             // Si el usuario seleccionó una nueva imagen al editar o crear, la subimos
             if (file) {
                 imageUrl = await uploadImage(file);  //subir la imagen, con el retorno de imgBB (nueva URL)
             }
+            
             // armar el producto completo
             const productData = {
                 ...product,
@@ -91,15 +93,14 @@ export const ProductFormContainer = () => {
                 image: imageUrl
             };
 
-            if (id) { //este id viene se useParams para actualizar o modificar el producto
-                // MODO EDICIÓN: Actualizamos el documento existente
-                const docRef = doc(db, "products", id);
+            if (id) { 
+                // MODO EDICIÓN: Actualizamos el documento existente en la colección correcta
+                const docRef = doc(db, "turnos de servicios", id);
                 await updateDoc(docRef, productData);
                 alert("¡Producto actualizado con éxito!");
                 navigate("/admin/products", { replace: true });
             } else {
                 // MODO CREACIÓN: Alta de un producto nuevo
-                // alta
                 const newId = await createProduct(productData);
                 // vaciar
                 setProduct({ name: "", price: "", category: "", description: "", image: "" });
