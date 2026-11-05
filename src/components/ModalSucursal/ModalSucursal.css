@@ -1,0 +1,6 @@
+/* Efecto hover interactivo para los locales */
+.btn-sucursal-item:hover {
+    background-color: #fff0f5 !important; /* Rosa pastel suave */
+    border-color: #d4a3b8 !important;     /* Borde rosa viejo destacado */
+    transform: translateY(-2px);           /* Sutil elevación de la tarjeta */
+}

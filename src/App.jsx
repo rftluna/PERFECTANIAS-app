@@ -1,64 +1,40 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+// 1. ESTILOS GLOBALES Y LIBRERÍAS DE TERCEROS
+import "bootstrap/dist/css/bootstrap.min.css";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
 
-import { ItemListContainer } from "./components/ItemListContainer/ItemListContainer";
-import { ItemDetailContainer } from "./components/ItemDetailContainer/ItemDetailContainer";
-import { CartView } from "./components/Cart/CartView";
-
-import { ProductFormContainer } from "./components/adminComponents/ProductForm/ProductFormContainer";
-import { ProductSuccess } from "./components/adminComponents/ProductSuccess";
-import { Dashboard } from "./components/adminComponents/Dashboard/Dashboard";
-import { ProductAdminListContainer } from "./components/adminComponents/ProductAdminListContainer/ProductAdminListContainer";
-
-import { Login } from "./components/Login/Login";
-import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
-
-import { PublicLayout } from "./layouts/PublicLayout";
-import { AdminLayout } from "./layouts/AdminLayout";
+// 2. IMPORTACIONES DE LOS COMPONENTES DE PERFECTANIAS
+import { TurnoProvider } from "./context/TurnoContext";
+import { Nav } from "./components/Nav/Nav";
+import { Footer } from "./components/Footer/Footer";
+import { ReservaDashboard } from "./components/ReservaDashboard/ReservaDashboard";
 
 function App() {
     return (
-        <Routes>
-            {/*-------------------------------- RUTAS PUBLICAS -------------------------------- */}
-            <Route element={<PublicLayout />}>
-                <Route path="/" element={<ItemListContainer />} />
+        <TurnoProvider>
+            <div className="d-flex flex-column min-vh-100 bg-white">
+                {/* CONTENEDOR DE ALERTAS ANIMADAS (Toastify) */}
+                <ToastContainer position="top-right" autoClose={2500} theme="colored" />
 
-                {/* Ruta opcional para filtrar categorias */}
-                <Route path="/category/:category" element={<ItemListContainer />} />
+                {/* BARRA DE NAVEGACIÓN PERMANENTE */}
+                <Nav />
 
-                <Route path="/product/:id" element={<ItemDetailContainer />} />
+                {/* ENRUTADOR PRINCIPAL DENTRO DEL CUERPO DE LA APP */}
+                <main className="flex-grow-1">
+                    <Routes>
+                        {/* Todas las rutas principales cargan tu panel de control de turnos */}
+                        <Route path="/" element={<ReservaDashboard />} />
+                        <Route path="/category/:category" element={<ReservaDashboard />} />
+                        <Route path="/turnos" element={<ReservaDashboard />} />
+                    </Routes>
+                </main>
 
-                <Route path="/cart" element={<CartView />} />
-            </Route>
-
-            {/* LOGIN DE ADMINISTRACIÓN */}
-            <Route path="/admin/login" element={<Login />} />
-
-            {/*-------------------------------- RUTAS PROTEGIDAS DE ADMINISTRACION  -------------------------------- */}
-            <Route
-                path="/admin"
-                element={
-                    <ProtectedRoute>
-                        <AdminLayout />
-                    </ProtectedRoute>
-                }
-            >
-                {/* RUTAS ADMINISTRACIÓN */}
-                <Route index element={<Navigate to="dashboard" replace />} />
-
-                <Route path="dashboard" element={<Dashboard />} />
-
-                <Route path="products/new" element={<ProductFormContainer />} />
-
-                <Route path="products/success/:id" element={<ProductSuccess />} />
-
-                {/* Nueva ruta para ver el listado completo con opciones de Editar y Eliminar */}
-                <Route path="products" element={<ProductAdminListContainer />} />
-
-                {/* Agrego esta línea para que la edición en dashboard funcione */}
-                <Route path="products/edit/:id" element={<ProductFormContainer />} />
-            </Route>
-        </Routes>
+                {/* PIE DE PÁGINA PERMANENTE CON ICONOS DE INSTAGRAM Y WHATSAPP */}
+                <Footer />
+            </div>
+        </TurnoProvider>
     );
 }
 

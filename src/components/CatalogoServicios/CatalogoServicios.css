@@ -1,0 +1,5 @@
+/* Iluminación estética para servicios elegidos */
+.border-rosa-activo {
+    background-color: #fff5f7 !important; /* Fondo rosa lavado */
+    transform: scale(1.01);                /* Sutil ensanchamiento estético */
+}

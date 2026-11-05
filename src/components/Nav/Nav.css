@@ -1,33 +1,99 @@
-.nav-list {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
+/* PALETA DE COLORES "AESTHETIC" PERFECTANIAS */
+:root {
+    --rosa-fondo: #fff5f7;    /* Fondo rosa pastel ultra suave */
+    --rosa-marca: #d4a3b8;    /* Rosa viejo elegante para destacar */
+    --gris-texto: #4a4a4a;    /* Gris oscuro suave para buena lectura */
 }
 
-.nav-list a {
-  font-weight: 500;
-  transition: 0.25s;
+/* NAVBAR GENERAL (Fondo blanco puro, fino y elegante) */
+.nav-perfectanias {
+    width: 100%;
+    background-color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid var(--rosa-marca);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.nav-list a:hover {
-  color: var(--primary);
+.nav-container-perfectanias {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    width: 100%;
 }
 
-.incart {
-  margin-left: 0.4rem;
+/* LOGO O NOMBRE DE MARCA */
+.brand-perfectanias {
+    font-size: 1.25rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--rosa-marca) !important;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-decoration: none;
+}
 
-  width: 22px;
-  height: 22px;
+/* ENLACES Y BOTONES DEL MENÚ */
+.nav-items-perfectanias {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
 
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
+/* Modificamos los links para que se vean estéticos sobre fondo blanco */
+.nav-perfectanias .nav-link-item {
+    color: var(--gris-texto) !important;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s ease-in-out;
+    background: transparent;
+    border: none;
+    padding: 0.4rem 0.8rem;
+}
 
-  border-radius: 50%;
+.nav-perfectanias .nav-link-item:hover,
+.nav-perfectanias .nav-link-item.activo {
+    color: var(--rosa-marca) !important;
+}
 
-  background: var(--primary);
-  color: white;
+.nav-perfectanias .nav-link-item.activo {
+    font-weight: bold;
+    background-color: var(--rosa-fondo);
+    border-radius: 20px;
+}
 
-  font-size: 0.75rem;
-  font-weight: bold;
+/* CORRECCIÓN DEFECTO: El menú colapsable ahora empuja en vertical sin flotar encima */
+.nav-collapse-perfectanias {
+    width: 100%;
+}
+
+/* RESPONSIVE: Comportamiento en Celulares y Tablets */
+@media (max-width: 991.98px) {
+    .nav-container-perfectanias {
+        flex-wrap: wrap;
+    }
+
+    /* Forzamos a las categorías a desplegarse hacia abajo de forma prolija en móviles */
+    .nav-items-perfectanias {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        width: 100%;
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #ffffff;
+        border: 1px solid var(--rosa-fondo);
+        border-radius: 12px;
+    }
+
+    .nav-perfectanias .nav-link-item {
+        text-align: center;
+        width: 100%;
+        border-bottom: 1px solid var(--rosa-fondo);
+    }
+
+    .nav-perfectanias .nav-link-item:last-child {
+        border-bottom: none;
+    }
 }
