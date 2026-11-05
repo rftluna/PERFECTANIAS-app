@@ -78,11 +78,14 @@ export const TurnoProvider = ({ children }) => {
             }
 
             toast.success("🎉 ¡Tu turno ha sido reservado con éxito!");
+
+            // 🔥 LA CORRECCIÓN: Reseteamos absolutamente todo, incluida la sucursal
             setPaso(1);
             setServiciosSeleccionados([]);
-            setSucursal(null);
             setFechaSeleccionada("");
             setHoraSeleccionada("");
+            setSucursal(null); // ← Esto obliga al Modal inicial a saltar de vuelta a la pantalla
+            setDatosCliente({ nombre: "", apellido: "", telefono: "", email: "", notas: "" });
         } catch (error) {
             toast.error("Error al guardar: " + error.message);
         } finally {
