@@ -1,13 +1,13 @@
-import { useState } from "react";
 import { Modal, ListGroup } from "react-bootstrap";
 import { useTurno } from "../../context/TurnoContext";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
 export const ModalSucursal = () => {
-    // 🔥 CORRECCIÓN CLAVE: Cambiamos el " - > " por el " = " oficial de asignación
     const { setSucursal, setPaso, sucursal } = useTurno();
 
-    const [show, setShow] = useState(!sucursal);
+    // 🔥 CORRECCIÓN DEFINITIVA: En lugar de un useState estático,
+    // el modal se muestra dinámicamente si no hay ninguna sucursal seleccionada
+    const show = !sucursal;
 
     const listaSucursales = [
         { id: "casanova", nombre: "Isidro Casanova", direccion: "República de Portugal 2812, Isidro Casanova, Provincia de Buenos Aires" },
@@ -17,7 +17,6 @@ export const ModalSucursal = () => {
 
     const elegirLocal = (local) => {
         setSucursal(local);
-        setShow(false);
         setPaso(2);
     };
 
