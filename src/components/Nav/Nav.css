@@ -1,99 +1,117 @@
-/* PALETA DE COLORES "AESTHETIC" PERFECTANIAS */
-:root {
-    --rosa-fondo: #fff5f7;    /* Fondo rosa pastel ultra suave */
-    --rosa-marca: #d4a3b8;    /* Rosa viejo elegante para destacar */
-    --gris-texto: #4a4a4a;    /* Gris oscuro suave para buena lectura */
-}
 
-/* NAVBAR GENERAL (Fondo blanco puro, fino y elegante) */
+/* ==========================================
+   NAVBAR - PERFECTANIAS
+   ========================================== */
+
 .nav-perfectanias {
     width: 100%;
+    min-height: 64px;
     background-color: #ffffff;
-    padding: 0.75rem 1.5rem;
-    border-bottom: 1px solid var(--rosa-marca);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid #f1e3e9;
+    position: relative;
+    z-index: 100;
 }
 
-.nav-container-perfectanias {
+.nav-container {
+    padding: 8px 24px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 0;
-    width: 100%;
+    justify-content: space-between;
+    gap: 15px;
 }
 
-/* LOGO O NOMBRE DE MARCA */
+/* MARCA */
+
 .brand-perfectanias {
-    font-size: 1.25rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    color: var(--rosa-marca) !important;
+    border: none;
+    background: transparent;
+    color: #d4a3b8;
+    font-size: 1.05rem;
+    font-weight: 700;
     letter-spacing: 1px;
+    white-space: nowrap;
     cursor: pointer;
-    text-decoration: none;
+    padding: 8px 0;
 }
 
-/* ENLACES Y BOTONES DEL MENÚ */
+.brand-perfectanias span {
+    color: #e5b85c;
+}
+
+/* MENÚ */
+
 .nav-items-perfectanias {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    justify-content: center;
+    gap: 22px;
+    padding: 8px 18px;
+    border-radius: 30px;
+    background-color: #fff9fb;
+    border: 1px solid #f1e3e9;
 }
 
-/* Modificamos los links para que se vean estéticos sobre fondo blanco */
-.nav-perfectanias .nav-link-item {
-    color: var(--gris-texto) !important;
-    cursor: pointer;
-    font-weight: 500;
-    font-size: 0.95rem;
-    transition: all 0.2s ease-in-out;
+.nav-link-item {
     background: transparent;
     border: none;
-    padding: 0.4rem 0.8rem;
+    padding: 5px 3px;
+    color: #444444;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s ease;
+    white-space: nowrap;
 }
 
-.nav-perfectanias .nav-link-item:hover,
-.nav-perfectanias .nav-link-item.activo {
-    color: var(--rosa-marca) !important;
+.nav-link-item:hover,
+.nav-link-item.activo {
+    color: #d4a3b8;
 }
 
-.nav-perfectanias .nav-link-item.activo {
-    font-weight: bold;
-    background-color: var(--rosa-fondo);
-    border-radius: 20px;
+.nav-link-item.activo {
+    font-weight: 700;
 }
 
-/* CORRECCIÓN DEFECTO: El menú colapsable ahora empuja en vertical sin flotar encima */
-.nav-collapse-perfectanias {
-    width: 100%;
+/* HAMBURGUESA */
+
+.nav-toggler-custom {
+    border: 1px solid #f1e3e9;
+    padding: 6px 9px;
 }
 
-/* RESPONSIVE: Comportamiento en Celulares y Tablets */
-@media (max-width: 991.98px) {
-    .nav-container-perfectanias {
-        flex-wrap: wrap;
+.nav-toggler-custom:focus {
+    box-shadow: 0 0 0 3px rgba(212, 163, 184, 0.2);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 991px) {
+
+    .nav-container {
+        padding: 8px 16px;
     }
 
-    /* Forzamos a las categorías a desplegarse hacia abajo de forma prolija en móviles */
+    .navbar-collapse {
+        width: 100%;
+        flex-basis: 100%;
+    }
+
     .nav-items-perfectanias {
         flex-direction: column;
         align-items: stretch;
-        gap: 0.5rem;
-        width: 100%;
-        margin-top: 1rem;
-        padding: 1rem;
-        background-color: #ffffff;
-        border: 1px solid var(--rosa-fondo);
+        gap: 8px;
+        margin-top: 12px;
+        padding: 12px;
         border-radius: 12px;
     }
 
-    .nav-perfectanias .nav-link-item {
+    .nav-link-item {
         text-align: center;
-        width: 100%;
-        border-bottom: 1px solid var(--rosa-fondo);
+        padding: 10px;
     }
+}
 
-    .nav-perfectanias .nav-link-item:last-child {
-        border-bottom: none;
+@media (min-width: 992px) {
+    .navbar-collapse {
+        flex-grow: 0;
     }
 }

@@ -1,33 +1,56 @@
-/* Efecto hover interactivo para los locales */
+
+/* ==========================================
+   MODAL DE SUCURSALES - PERFECTANIAS
+   ========================================== */
+
+.modal-perfectanias .modal-content {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.modal-perfectanias .modal-body {
+    background-color: #ffffff;
+    border-radius: 16px;
+}
+
+.btn-sucursal-item {
+    cursor: pointer;
+    border-color: #fff0f5 !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
 .btn-sucursal-item:hover {
-    background-color: #fff0f5 !important; /* Rosa pastel suave */
-    border-color: #d4a3b8 !important;     /* Borde rosa viejo destacado */
-    transform: translateY(-2px);           /* Sutil elevación de la tarjeta */
+    background-color: #fff0f5 !important;
+    border-color: #d4a3b8 !important;
+    transform: translateY(-2px);
 }
 
-/* Animación de entrada mágica y brillo para el logo de Perfectanias */
 @keyframes magicEntry {
-  0% {
-    opacity: 0;
-    transform: scale(0.8) translateY(15px);
-    filter: drop-shadow(0 0 2px rgba(212, 163, 184, 0.3));
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.05) translateY(0);
-    filter: drop-shadow(0 0 15px rgba(212, 163, 184, 0.9)) brightness(1.2);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-    filter: drop-shadow(0 0 8px rgba(212, 163, 184, 0.6));
-  }
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(15px);
+        filter: drop-shadow(0 0 2px rgba(212, 163, 184, 0.3));
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 15px rgba(212, 163, 184, 0.9));
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: drop-shadow(0 0 8px rgba(212, 163, 184, 0.6));
+    }
 }
 
-.logo-magic-animation {
-  animation: magicEntry 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+.logo-magic-animation,
+.logo-magic-anim {
+    animation: magicEntry 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .splash-container {
-  animation: fadeIn 0.5s ease-in-out;
+    animation: fadeIn 0.5s ease-in-out;
 }

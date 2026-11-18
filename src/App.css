@@ -1,184 +1,387 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
 
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+/* ==========================================
+   PERFECTANIAS - ESTILOS GLOBALES
+   ========================================== */
+
+:root {
+    --rosa-principal: #d4a3b8;
+    --rosa-claro: #fff0f5;
+    --rosa-fondo: #fff9fb;
+    --texto-principal: #343434;
+    --texto-secundario: #777777;
+    --borde-suave: #f1e3e9;
+    --blanco: #ffffff;
 }
 
-.hero {
-  position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
+* {
+    box-sizing: border-box;
 }
 
-#center {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
+html {
+    scroll-behavior: smooth;
 }
 
-#next-steps {
-  display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
+body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: var(--texto-principal);
+    background-color: var(--blanco);
 }
 
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-}
-
-#next-steps ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
+#root {
+    min-height: 100vh;
     display: flex;
-    padding: 6px 12px;
+    flex-direction: column;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* CONTENEDOR PRINCIPAL */
+
+main {
+    flex: 1;
+    width: 100%;
+}
+
+/* ENCABEZADO DE PERFECTANIAS */
+
+.perfectanias-header {
+    display: flex;
     align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
+    gap: 20px;
+    padding: 24px 5%;
+    background-color: var(--blanco);
+    border-bottom: 1px solid var(--borde-suave);
 }
 
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
+.perfectanias-logo {
+    width: 88px;
+    height: 88px;
+    object-fit: contain;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.ticks {
-  position: relative;
-  width: 100%;
+.perfectanias-info h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 500;
+}
 
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
+.perfectanias-subtitulo {
+    margin: 4px 0;
+    color: var(--texto-secundario);
+    font-size: 1rem;
+}
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
-  }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
-  }
+.perfectanias-rating {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 5px;
+}
+
+.perfectanias-estrellas {
+    color: #000000;
+    letter-spacing: 1px;
+}
+
+.perfectanias-puntuacion {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* CATÁLOGO */
+
+.catalogo-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 24px;
+}
+
+.catalogo-titulo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+
+/* TARJETAS DE SERVICIOS */
+
+.catalogo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 22px;
+}
+
+.servicio-card {
+    overflow: hidden;
+    border: 1px solid var(--borde-suave);
+    border-radius: 14px;
+    background-color: var(--blanco);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.servicio-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(212, 163, 184, 0.18);
+}
+
+.servicio-imagen {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+}
+
+.servicio-contenido {
+    padding: 15px;
+}
+
+.servicio-nombre {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.servicio-descripcion {
+    color: var(--texto-secundario);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.servicio-precio {
+    color: var(--rosa-principal);
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+/* TEXTO LIMITADO A DOS RENGLONES */
+
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* MODAL DE SUCURSALES */
+
+.modal-perfectanias .modal-content {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modal-perfectanias .modal-body {
+    padding: 24px;
+}
+
+/* SUCURSALES */
+
+.btn-sucursal-item {
+    transition: all 0.2s ease-in-out !important;
+}
+
+.btn-sucursal-item:hover {
+    background-color: var(--rosa-claro) !important;
+    border-color: var(--rosa-principal) !important;
+    transform: translateY(-2px);
+}
+
+/* SERVICIOS SELECCIONADOS */
+
+.border-rosa-activo {
+    background-color: #fff5f7 !important;
+    border-color: var(--rosa-principal) !important;
+}
+
+/* ANIMACIONES */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes magicEntry {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(15px);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.logo-magic-anim {
+    animation: magicEntry 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 576px) {
+    .perfectanias-header {
+        padding: 18px 16px;
+        gap: 14px;
+    }
+
+    .perfectanias-logo {
+        width: 68px;
+        height: 68px;
+    }
+
+    .perfectanias-info h1 {
+        font-size: 1.5rem;
+    }
+
+    .perfectanias-subtitulo {
+        font-size: 0.85rem;
+    }
+
+    .catalogo-container {
+        padding: 22px 15px;
+    }
+
+    .catalogo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .servicio-contenido {
+        padding: 10px;
+    }
+}
+
+/* ==========================================
+   DASHBOARD - PERFECTANIAS
+   ========================================== */
+
+.reserva-dashboard {
+    min-height: 75vh;
+    padding: 20px 4%;
+    background-color: #ffffff;
+}
+
+/* ENCABEZADO */
+
+.perfectanias-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 0 25px;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.perfectanias-logo {
+    width: 95px;
+    height: 95px;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+.perfectanias-info h1 {
+    margin: 0;
+    color: #333333;
+    font-size: 1.9rem;
+    font-weight: 600;
+}
+
+.perfectanias-subtitulo {
+    margin: 4px 0;
+    color: #777777;
+    font-size: 0.95rem;
+}
+
+.perfectanias-rating {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.perfectanias-estrellas {
+    color: #222222;
+    letter-spacing: 2px;
+    font-size: 1rem;
+}
+
+.perfectanias-puntuacion {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+/* RESUMEN */
+
+.resumen-reserva {
+    background-color: #fff5f7;
+    position: sticky;
+    top: 20px;
+}
+
+.resumen-reserva h5 {
+    color: #d4a3b8;
+    letter-spacing: 1px;
+}
+
+.total-reserva {
+    color: #d4a3b8;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 576px) {
+    .reserva-dashboard {
+        padding: 15px;
+    }
+
+    .perfectanias-header {
+        gap: 14px;
+    }
+
+    .perfectanias-logo {
+        width: 72px;
+        height: 72px;
+    }
+
+    .perfectanias-info h1 {
+        font-size: 1.5rem;
+    }
 }

@@ -66,7 +66,7 @@ export const ModalSucursal = () => {
                                 src="https://i.ibb.co/JWgZFvtx/logo.png"
                                 alt="Perfectanias Logo"
                                 className="logo-magic-anim mb-3 img-fluid shadow-sm"
-                                style={{ width: "240px", height: "240px", objectFit: "contain", borderRadius: "50%" }}
+                                style={{ width: "140px", height: "140px", objectFit: "contain", borderRadius: "50%" }}
                             />
                             <h4 className="fw-bold mt-3" style={{ letterSpacing: "1.5px", color: "#d4a3b8" }}>
                                 PERFECTANIAS
