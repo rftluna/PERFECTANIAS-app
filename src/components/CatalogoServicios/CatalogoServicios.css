@@ -67,3 +67,73 @@
     outline: 2px solid #d4a3b8;
     outline-offset: 3px;
 }
+
+/* ==========================================
+   PERFECTANIAS - BOTÓN VER DESCRIPCIÓN
+   ESTILO ROSA ELEGANTE
+   ========================================== */
+
+.servicio-descripcion-container {
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
+}
+
+.servicio-descripcion-container .servicio-descripcion {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #858085 !important;
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+    margin-bottom: 9px !important;
+}
+
+.servicio-descripcion-container .servicio-descripcion.expandida {
+    display: block !important;
+    -webkit-line-clamp: unset !important;
+    overflow: visible !important;
+}
+
+.servicio-descripcion-container .btn-ver-descripcion {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+
+    background-color: #fff7fa !important;
+    color: #bd829d !important;
+
+    border: 1px solid #ead1dc !important;
+    border-radius: 30px !important;
+
+    padding: 5px 13px !important;
+    margin: 0 0 8px !important;
+
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px;
+
+    cursor: pointer;
+    text-decoration: none !important;
+
+    box-shadow: 0 2px 5px rgba(212, 163, 184, 0.1);
+    transition: all 0.25s ease !important;
+}
+
+.servicio-descripcion-container .btn-ver-descripcion:hover {
+    background-color: #d4a3b8 !important;
+    color: #ffffff !important;
+    border-color: #d4a3b8 !important;
+    box-shadow: 0 4px 10px rgba(212, 163, 184, 0.25);
+    transform: translateY(-2px);
+}
+
+.servicio-descripcion-container .btn-ver-descripcion:active {
+    transform: scale(0.97);
+}
+
+.servicio-descripcion-container .btn-ver-descripcion:focus-visible {
+    outline: 2px solid #d4a3b8 !important;
+    outline-offset: 3px;
+}

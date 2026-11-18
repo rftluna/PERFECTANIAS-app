@@ -5,6 +5,7 @@ import { db } from "../../firebase/config";
 import { useTurno } from "../../context/TurnoContext";
 import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
 import { FaCheckCircle, FaPlusCircle } from "react-icons/fa";
+import "./CatalogoServicios.css";
 
 export const CatalogoServicios = () => {
     const { serviciosSeleccionados, toggleServicio, setPaso } = useTurno();
