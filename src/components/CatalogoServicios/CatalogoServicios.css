@@ -1,5 +1,52 @@
-/* Iluminación estética para servicios elegidos */
+/* ==========================================
+   ESTILOS Y ANIMACIONES - PERFECTANIAS
+   ========================================== */
+
+/* 1. Efecto hover interactivo para los locales */
+.btn-sucursal-item:hover {
+    background-color: #fff0f5 !important; /* Rosa pastel suave */
+    border-color: #d4a3b8 !important; /* Borde rosa viejo destacado */
+    transform: translateY(-2px); /* Sutil elevación de la tarjeta */
+}
+
+/* 2. Animación de entrada mágica y brillo para el logo de Perfectanias */
+@keyframes magicEntry {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(15px);
+        filter: drop-shadow(0 0 2px rgba(212, 163, 184, 0.3));
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05) translateY(0);
+        filter: drop-shadow(0 0 15px rgba(212, 163, 184, 0.9)) brightness(1.2);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: drop-shadow(0 0 8px rgba(212, 163, 184, 0.6));
+    }
+}
+
+.logo-magic-animation {
+    animation: magicEntry 2s ease-in-out infinite alternate;
+}
+
+.splash-container {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* 3. Iluminación estética para servicios elegidos en el catálogo */
 .border-rosa-activo {
     background-color: #fff5f7 !important; /* Fondo rosa lavado */
-    transform: scale(1.01);                /* Sutil ensanchamiento estético */
+    transform: scale(1.01); /* Sutil ensanchamiento estético */
+}
+
+/* 4. Limita el texto de la descripción a exactamente 2 líneas y agrega puntos suspensivos (...) */
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

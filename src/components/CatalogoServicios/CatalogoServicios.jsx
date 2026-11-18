@@ -71,6 +71,7 @@ export const CatalogoServicios = () => {
                                     {/* Nombre, descripción y precio */}
                                     <Col xs={6} sm={7}>
                                         <h6 className="fw-bold m-0 text-dark">{srv.name}</h6>
+                                        {/* Aplicamos la clase text-truncate-2 para recortar a dos renglones */}
                                         <p className="text-muted m-0 my-1 small text-truncate-2" style={{ fontSize: "12px", lineHeight: "1.3" }}>
                                             {srv.description}
                                         </p>

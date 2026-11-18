@@ -1,26 +1,62 @@
-header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+/* =========================
+   CABECERA TIPO AGENDAMAS
+========================= */
 
-  padding: 1rem 3rem;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo-container a {
+.business-info {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 24px;
+
+  max-width: 1200px;
+  margin: 40px auto 30px;
+  padding: 0 20px;
 }
 
-.logo-container img {
-  width: 45px;
+.business-logo img {
+  width: 90px;
+  height: 90px;
+
+  object-fit: cover;
+
+  border-radius: 20px;
+
+  background: white;
+
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+
+  padding: 8px;
 }
 
-.logo-container span {
-  font-size: 1.7rem;
-  font-weight: bold;
-  color: var(--text);
+.business-details h1 {
+  margin: 0;
+  font-size: 3rem;
+  font-weight: 500;
+  color: #111;
+}
+
+.business-subtitle {
+  margin: 5px 0 15px;
+  color: #6c757d;
+  font-size: 1.3rem;
+}
+
+.business-rating {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 1.4rem;
+}
+
+.stars {
+  color: #000;
+  letter-spacing: 2px;
+}
+
+.score {
+  font-weight: 700;
+}
+
+.reviews {
+  color: #555;
 }
