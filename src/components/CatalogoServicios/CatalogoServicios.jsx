@@ -1,5 +1,5 @@
-
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { useTurno } from "../../context/TurnoContext";
@@ -8,13 +8,24 @@ import { FaCheckCircle, FaPlusCircle } from "react-icons/fa";
 import "./CatalogoServicios.css";
 
 export const CatalogoServicios = () => {
+    const { category } = useParams();
+
     const { serviciosSeleccionados, toggleServicio, setPaso } = useTurno();
 
     const [servicios, setServicios] = useState([]);
     const [loading, setLoading] = useState(true);
     const [descripcionExpandida, setDescripcionExpandida] = useState({});
+    const [filtroCategoria, setFiltroCategoria] = useState("todos");
 
-    // Conectamos con Firestore para traer los servicios
+    const esSeccionPestanas = category === "pestanas";
+
+    // Reiniciar filtro y descripciones al cambiar de sección
+    useEffect(() => {
+        setFiltroCategoria("todos");
+        setDescripcionExpandida({});
+    }, [category]);
+
+    // Cargar servicios desde Firestore
     useEffect(() => {
         const fetchServicios = async () => {
             try {
@@ -27,7 +38,7 @@ export const CatalogoServicios = () => {
 
                 setServicios(dataMapeada);
             } catch (error) {
-                console.error("Error al cargar servicios de Firestore: ", error);
+                console.error("Error al cargar servicios de Firestore:", error);
             } finally {
                 setLoading(false);
             }
@@ -36,19 +47,7 @@ export const CatalogoServicios = () => {
         fetchServicios();
     }, []);
 
-    // Mostrar indicador de carga
-    if (loading) {
-        return (
-            <div className="text-center py-5">
-                <Spinner animation="border" style={{ color: "#d4a3b8" }} />
-                <p className="text-muted mt-2 small">
-                    Cargando catálogo estético...
-                </p>
-            </div>
-        );
-    }
-
-    // Expandir o contraer la descripción de un servicio
+    // Expandir o contraer descripción
     const manejarDescripcion = (id) => {
         setDescripcionExpandida((prev) => ({
             ...prev,
@@ -56,140 +55,143 @@ export const CatalogoServicios = () => {
         }));
     };
 
+    // Filtrado de servicios
+    const serviciosFiltrados = servicios.filter((srv) => {
+        if (!esSeccionPestanas) {
+            return true;
+        }
+
+        if (filtroCategoria === "todos") {
+            return srv.category === "Modelado - Tratamientos" || srv.category === "Combos";
+        }
+
+        return srv.category === filtroCategoria;
+    });
+
+    // Cargando catálogo
+    if (loading) {
+        return (
+            <div className="text-center py-5">
+                <Spinner animation="border" style={{ color: "#d4a3b8" }} />
+
+                <p className="text-muted mt-2 small">Cargando catálogo estético...</p>
+            </div>
+        );
+    }
+
     return (
-        <Container fluid className="p-0">
+        <Container fluid className="p-0 catalogo-servicios">
+            <h4 className="fw-bold mb-3 catalogo-titulo">{esSeccionPestanas ? "Servicios de pestañas y cejas" : "Seleccioná los servicios"}</h4>
 
-            <h4 className="fw-bold mb-4" style={{ color: "#4a4a4a" }}>
-                Selecciona los servicios
-            </h4>
+            {/* FILTROS DE PESTAÑAS */}
+            {esSeccionPestanas && (
+                <div className="filtros-servicios">
+                    <button type="button" className={`filtro-servicio ${filtroCategoria === "todos" ? "activo" : ""}`} onClick={() => setFiltroCategoria("todos")}>
+                        Todos
+                    </button>
 
-            <Row className="g-3">
-                {servicios.map((srv) => {
+                    <button type="button" className={`filtro-servicio ${filtroCategoria === "Modelado - Tratamientos" ? "activo" : ""}`} onClick={() => setFiltroCategoria("Modelado - Tratamientos")}>
+                        Modelado - Tratamientos
+                    </button>
 
-                    // Comprobamos si el servicio está seleccionado
-                    const elegido = serviciosSeleccionados.some(
-                        (s) => s.id === srv.id
-                    );
-
-                    const expandida = descripcionExpandida[srv.id];
-
-                    return (
-                        <Col xs={12} key={srv.id}>
-                            <Card
-                                className={`servicio-card p-3 ${
-                                    elegido ? "border-rosa-activo" : ""
-                                }`}
-                                style={{
-                                    backgroundColor: elegido ? "#fff5f7" : "#ffffff",
-                                    borderColor: elegido ? "#d4a3b8" : "#f1e3e9"
-                                }}
-                            >
-
-                                <Row className="align-items-center">
-
-                                    {/* Imagen del servicio */}
-                                    <Col xs={3} sm={2} className="text-center">
-                                        <img
-                                            src={srv.image}
-                                            alt={srv.name}
-                                            className="servicio-imagen rounded-3"
-                                        />
-                                    </Col>
-
-                                    {/* Información del servicio */}
-                                    <Col xs={6} sm={7}>
-
-                                        <h6 className="servicio-nombre m-0 text-dark">
-                                            {srv.name}
-                                        </h6>
-
-                                        {/* Descripción expandible */}
-                                        <div className="servicio-descripcion-container">
-
-                                            <p
-                                                className={`servicio-descripcion ${
-                                                    expandida ? "expandida" : ""
-                                                }`}
-                                            >
-                                                {srv.description}
-                                            </p>
-
-                                            {srv.description && srv.description.length > 0 && (
-                                                <button
-                                                    type="button"
-                                                    className="btn-ver-descripcion"
-                                                    onClick={() => manejarDescripcion(srv.id)}
-                                                >
-                                                    {expandida
-                                                        ? "Ver menos"
-                                                        : "Ver descripción..."}
-                                                </button>
-                                            )}
-
-                                        </div>
-
-                                        <span className="servicio-precio">
-                                            ${srv.price}
-                                        </span>
-
-                                    </Col>
-
-                                    {/* Botón para seleccionar o quitar */}
-                                    <Col xs={3} sm={3} className="text-end">
-
-                                        <Button
-                                            variant={elegido ? "danger" : "outline-primary"}
-                                            className="rounded-pill px-3 py-1 btn-sm fw-bold d-inline-flex align-items-center gap-1"
-                                            style={{
-                                                backgroundColor: elegido
-                                                    ? "#d4a3b8"
-                                                    : "transparent",
-                                                borderColor: "#d4a3b8",
-                                                color: elegido
-                                                    ? "#ffffff"
-                                                    : "#d4a3b8"
-                                            }}
-                                            onClick={() => toggleServicio(srv)}
-                                        >
-                                            {elegido ? (
-                                                <>
-                                                    <FaCheckCircle /> Quitar
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <FaPlusCircle /> Elegir
-                                                </>
-                                            )}
-                                        </Button>
-
-                                    </Col>
-
-                                </Row>
-
-                            </Card>
-                        </Col>
-                    );
-                })}
-            </Row>
-
-            {/* Botón para avanzar al calendario */}
-            {serviciosSeleccionados.length > 0 && (
-                <div className="text-end mt-4">
-
-                    <Button
-                        className="fw-bold px-4 py-2 rounded-pill border-0 shadow-sm"
-                        style={{
-                            backgroundColor: "#d4a3b8",
-                            color: "#ffffff"
-                        }}
-                        onClick={() => setPaso(3)}
-                    >
-                        Siguiente paso ➔
-                    </Button>
-
+                    <button type="button" className={`filtro-servicio ${filtroCategoria === "Combos" ? "activo" : ""}`} onClick={() => setFiltroCategoria("Combos")}>
+                        Combos
+                    </button>
                 </div>
             )}
 
+            {/* CATÁLOGO EN GRILLA */}
+            {serviciosFiltrados.length > 0 ? (
+                <Row className="g-3 catalogo-grid">
+                    {serviciosFiltrados.map((srv) => {
+                        const elegido = serviciosSeleccionados.some((s) => s.id === srv.id);
+
+                        const expandida = descripcionExpandida[srv.id] === true;
+
+                        const descripcionOriginal = typeof srv.description === "string" ? srv.description.trim() : "";
+
+                        const descripcion = descripcionOriginal || "La descripción de este servicio estará disponible próximamente.";
+
+                        return (
+                            <Col xs={10} md={40} lg={10} key={srv.id}>
+                                <Card className={`servicio-card ${elegido ? "servicio-elegido" : ""}`}>
+                                    {/* IMAGEN */}
+                                    <div className="servicio-imagen-container">
+                                        <img
+                                            src={srv.image}
+                                            alt={srv.name || "Servicio estético"}
+                                            className="servicio-imagen"
+                                            onError={(e) => {
+                                                e.currentTarget.style.display = "none";
+                                            }}
+                                        />
+
+                                        {elegido && (
+                                            <div className="servicio-badge-elegido">
+                                                <FaCheckCircle />
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* INFORMACIÓN */}
+                                    <Card.Body className="servicio-card-body">
+                                        <h6 className="servicio-nombre">{srv.name}</h6>
+
+                                        <div className="servicio-precio">${srv.price}</div>
+
+                                        {/* DESCRIPCIÓN */}
+                                        <div className="servicio-descripcion-container">
+                                            <p id={`descripcion-${srv.id}`} className={`servicio-descripcion ${expandida ? "expandida" : ""}`}>
+                                                {descripcion}
+                                            </p>
+
+                                            <button
+                                                type="button"
+                                                className="btn-ver-descripcion"
+                                                aria-expanded={expandida}
+                                                aria-controls={`descripcion-${srv.id}`}
+                                                onClick={() => manejarDescripcion(srv.id)}
+                                            >
+                                                {expandida ? "Ver menos" : "Ver descripción"}
+                                            </button>
+                                        </div>
+
+                                        {/* ELEGIR SERVICIO */}
+                                        <Button className={`btn-seleccionar-servicio ${elegido ? "seleccionado" : ""}`} onClick={() => toggleServicio(srv)}>
+                                            {elegido ? (
+                                                <>
+                                                    <FaCheckCircle />
+                                                    Quitar
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <FaPlusCircle />
+                                                    Elegir
+                                                </>
+                                            )}
+                                        </Button>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        );
+                    })}
+                </Row>
+            ) : (
+                <div className="catalogo-vacio">
+                    <span>✨</span>
+
+                    <p>No hay servicios disponibles en esta categoría por el momento.</p>
+                </div>
+            )}
+
+            {/* AVANZAR AL CALENDARIO */}
+            {serviciosSeleccionados.length > 0 && (
+                <div className="text-end mt-4">
+                    <Button className="btn-siguiente-paso" onClick={() => setPaso(3)}>
+                        Siguiente paso ➔
+                    </Button>
+                </div>
+            )}
         </Container>
     );
 };

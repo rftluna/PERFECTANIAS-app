@@ -1,139 +1,522 @@
 /* ==========================================
-   DESCRIPCIÓN Y BOTÓN ELEGANTE
-   ========================================== */
+   PERFECTANIAS - CATÁLOGO COMPACTO
+========================================== */
 
-.servicio-descripcion-container {
-    margin-top: 7px;
-    margin-bottom: 5px;
-}
-
-/* Descripción del servicio */
-.servicio-descripcion,
-.text-truncate-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.5;
-    margin-bottom: 7px;
-    color: #858085;
-    font-size: 12px;
-}
-
-/* Descripción desplegada */
-.servicio-descripcion.expandida {
-    display: block;
-    overflow: visible;
-    -webkit-line-clamp: unset;
-}
-
-/* Etiqueta Ver descripción */
-.btn-ver-descripcion {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #ead1dc;
-    border-radius: 20px;
-    background: #fff7fa;
-    padding: 4px 11px;
-    margin-bottom: 7px;
-
-    color: #bd829d;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.2px;
-
-    cursor: pointer;
-    transition: all 0.25s ease;
-}
-
-/* Efecto al pasar el cursor */
-.btn-ver-descripcion:hover {
-    background: #d4a3b8;
-    border-color: #d4a3b8;
-    color: #ffffff;
-    box-shadow: 0 3px 9px rgba(212, 163, 184, 0.22);
-    transform: translateY(-1px);
-}
-
-/* Efecto al presionar */
-.btn-ver-descripcion:active {
-    transform: scale(0.97);
-}
-
-/* Accesibilidad: foco con teclado */
-.btn-ver-descripcion:focus-visible {
-    outline: 2px solid #d4a3b8;
-    outline-offset: 3px;
+.catalogo-servicios {
+    width: 100%;
 }
 
 /* ==========================================
-   PERFECTANIAS - BOTÓN VER DESCRIPCIÓN
-   ESTILO ROSA ELEGANTE
-   ========================================== */
+   GRILLA DE SERVICIOS
+========================================== */
 
-.servicio-descripcion-container {
-    margin-top: 8px !important;
-    margin-bottom: 8px !important;
+.catalogo-grid {
+    align-items: stretch;
 }
 
-.servicio-descripcion-container .servicio-descripcion {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+.catalogo-grid > div {
+    display: flex;
+}
+
+/* ==========================================
+   TARJETA
+========================================== */
+
+.servicio-card {
+    width: 100%;
+    height: 100%;
+
+    border: 1px solid #f1e3e9;
+    border-radius: 16px;
+
     overflow: hidden;
-    text-overflow: ellipsis;
-    color: #858085 !important;
-    font-size: 12px !important;
-    line-height: 1.5 !important;
-    margin-bottom: 9px !important;
+
+    background-color: #ffffff;
+
+    box-shadow: 0 2px 8px rgba(80, 40, 60, 0.04);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+
+    display: flex;
+    flex-direction: column;
 }
 
-.servicio-descripcion-container .servicio-descripcion.expandida {
-    display: block !important;
-    -webkit-line-clamp: unset !important;
-    overflow: visible !important;
+.servicio-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow: 0 5px 14px rgba(80, 40, 60, 0.09);
 }
 
-.servicio-descripcion-container .btn-ver-descripcion {
-    display: inline-flex !important;
+/* Servicio seleccionado */
+.servicio-card.servicio-elegido {
+    border: 2px solid #d4a3b8;
+    background-color: #fff5f7;
+}
+
+/* ==========================================
+   IMAGEN CUADRADA
+========================================== */
+
+.servicio-imagen-container {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+
+    overflow: hidden;
+
+    position: relative;
+
+    background-color: #f9edf2;
+}
+
+.servicio-imagen {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+    object-position: center;
+
+    transition: transform 0.3s ease;
+}
+
+.servicio-card:hover .servicio-imagen {
+    transform: scale(1.04);
+}
+
+/* Icono seleccionado */
+.servicio-badge-elegido {
+    position: absolute;
+
+    top: 9px;
+    right: 9px;
+
+    width: 28px;
+    height: 28px;
+
+    display: flex;
     align-items: center;
     justify-content: center;
 
-    background-color: #fff7fa !important;
-    color: #bd829d !important;
+    background-color: #d4a3b8;
+    color: #ffffff;
 
-    border: 1px solid #ead1dc !important;
-    border-radius: 30px !important;
+    border-radius: 50%;
 
-    padding: 5px 13px !important;
-    margin: 0 0 8px !important;
+    font-size: 15px;
 
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.3px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* ==========================================
+   CONTENIDO DE LA TARJETA
+========================================== */
+
+.servicio-card-body {
+    padding: 12px;
+
+    display: flex;
+    flex-direction: column;
+
+    flex: 1;
+}
+
+/* Nombre */
+.servicio-nombre {
+    color: #383338;
+
+    font-size: 4px;
+    font-weight: 750;
+
+    line-height: 1.35;
+
+    margin: 0 0 7px;
+
+    min-height: 38px;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+
+    line-clamp: 3;
+
+    overflow: hidden;
+}
+
+/* Precio */
+.servicio-precio {
+    color: #bd829d;
+
+    font-size: 17px;
+    font-weight: 800;
+
+    margin-bottom: 8px;
+
+    line-height: 1.2;
+}
+
+/* ==========================================
+   DESCRIPCIÓN
+========================================== */
+
+.servicio-descripcion-container {
+    width: 100%;
+
+    margin-top: auto;
+    margin-bottom: 10px;
+
+    overflow: visible;
+}
+
+/* Descripción contraída */
+.servicio-descripcion-container .servicio-descripcion {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+
+    line-clamp: 2;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    white-space: normal;
+
+    line-height: 1.45;
+    max-height: 2.9em;
+
+    margin: 0 0 5px;
+
+    color: #858085;
+    font-size: 11px;
+}
+
+/* Descripción expandida */
+.servicio-descripcion-container .servicio-descripcion.expandida {
+    display: block;
+
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+
+    overflow: visible;
+    text-overflow: clip;
+
+    white-space: normal;
+
+    max-height: none;
+    height: auto;
+
+    line-height: 1.6;
+
+    margin-bottom: 8px;
+}
+
+/* Botón descripción */
+.servicio-descripcion-container .btn-ver-descripcion {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #ead1dc;
+    border-radius: 30px;
+
+    background-color: #fff7fa;
+    color: #bd829d;
+
+    padding: 5px 9px;
+
+    font-size: 10px;
+    font-weight: 600;
 
     cursor: pointer;
-    text-decoration: none !important;
+    text-decoration: none;
 
-    box-shadow: 0 2px 5px rgba(212, 163, 184, 0.1);
-    transition: all 0.25s ease !important;
+    transition: all 0.2s ease;
 }
 
 .servicio-descripcion-container .btn-ver-descripcion:hover {
+    background-color: #d4a3b8;
+    color: #ffffff;
+
+    border-color: #d4a3b8;
+}
+
+/* ==========================================
+   BOTÓN ELEGIR / QUITAR
+========================================== */
+
+.btn-seleccionar-servicio {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    border: 1px solid #d4a3b8 !important;
+    border-radius: 30px !important;
+
+    padding: 7px 10px !important;
+
+    background-color: #ffffff !important;
+    color: #bd829d !important;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    margin-top: auto;
+
+    transition: all 0.2s ease;
+}
+
+/* Hover */
+.btn-seleccionar-servicio:hover {
     background-color: #d4a3b8 !important;
     color: #ffffff !important;
-    border-color: #d4a3b8 !important;
-    box-shadow: 0 4px 10px rgba(212, 163, 184, 0.25);
-    transform: translateY(-2px);
 }
 
-.servicio-descripcion-container .btn-ver-descripcion:active {
-    transform: scale(0.97);
+/* Seleccionado */
+.btn-seleccionar-servicio.seleccionado {
+    background-color: #d4a3b8 !important;
+    color: #ffffff !important;
 }
 
-.servicio-descripcion-container .btn-ver-descripcion:focus-visible {
-    outline: 2px solid #d4a3b8 !important;
-    outline-offset: 3px;
+.btn-seleccionar-servicio.seleccionado:hover {
+    background-color: #bd829d !important;
+    border-color: #bd829d !important;
+}
+
+/* ==========================================
+   FILTROS
+========================================== */
+
+.filtros-servicios {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+    padding: 5px 0;
+}
+
+.filtro-servicio {
+    border: 1px solid #ead1dc;
+
+    background: #fff7fa;
+    color: #bd829d;
+
+    padding: 9px 18px;
+
+    border-radius: 30px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+
+.filtro-servicio:hover {
+    background: #f4e0e9;
+    border-color: #d4a3b8;
+}
+
+.filtro-servicio.activo {
+    background: #d4a3b8;
+    border-color: #d4a3b8;
+
+    color: #ffffff;
+
+    box-shadow: 0 3px 8px rgba(212, 163, 184, 0.25);
+}
+
+/* ==========================================
+   TÍTULO
+========================================== */
+
+.catalogo-titulo {
+    color: #4a4a4a;
+}
+
+/* ==========================================
+   CATÁLOGO VACÍO
+========================================== */
+
+.catalogo-vacio {
+    text-align: center;
+
+    padding: 45px 20px;
+
+    background: #fff7fa;
+
+    border: 1px solid #f1e3e9;
+    border-radius: 18px;
+
+    color: #987587;
+}
+
+.catalogo-vacio span {
+    display: block;
+
+    font-size: 32px;
+
+    margin-bottom: 10px;
+}
+
+.catalogo-vacio p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* ==========================================
+   BOTÓN SIGUIENTE PASO
+========================================== */
+
+.btn-siguiente-paso {
+    background-color: #d4a3b8 !important;
+    color: #ffffff !important;
+
+    border: none !important;
+
+    font-weight: 700 !important;
+
+    padding: 12px 24px !important;
+
+    border-radius: 30px !important;
+
+    box-shadow: 0 3px 8px rgba(212, 163, 184, 0.2);
+}
+
+.btn-siguiente-paso:hover {
+    background-color: #bd829d !important;
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (min-width: 577px) and (max-width: 991px) {
+    .servicio-card-body {
+        padding: 13px;
+    }
+
+    .servicio-nombre {
+        font-size: 15px;
+    }
+
+    .servicio-precio {
+        font-size: 18px;
+    }
+}
+
+/* ==========================================
+   CELULAR
+========================================== */
+
+@media (max-width: 576px) {
+    .catalogo-grid {
+        --bs-gutter-x: 0.65rem;
+        --bs-gutter-y: 0.85rem;
+    }
+
+    .servicio-card {
+        border-radius: 13px;
+    }
+
+    .servicio-card-body {
+        padding: 9px;
+    }
+
+    .servicio-nombre {
+        font-size: 12px;
+
+        min-height: 33px;
+
+        line-height: 1.35;
+
+        margin-bottom: 5px;
+    }
+
+    .servicio-precio {
+        font-size: 15px;
+
+        margin-bottom: 7px;
+    }
+
+    .servicio-descripcion-container {
+        margin-bottom: 8px;
+    }
+
+    .servicio-descripcion-container .servicio-descripcion {
+        font-size: 10px;
+
+        line-height: 1.4;
+
+        max-height: 2.8em;
+
+        margin-bottom: 5px;
+    }
+
+    .servicio-descripcion-container .servicio-descripcion.expandida {
+        font-size: 10px;
+    }
+
+    .servicio-descripcion-container .btn-ver-descripcion {
+        font-size: 9px;
+
+        padding: 4px 7px;
+    }
+
+    .btn-seleccionar-servicio {
+        font-size: 11px;
+
+        padding: 6px 7px !important;
+
+        gap: 4px;
+    }
+
+    .servicio-badge-elegido {
+        width: 24px;
+        height: 24px;
+
+        font-size: 13px;
+
+        top: 7px;
+        right: 7px;
+    }
+
+    .filtros-servicios {
+        gap: 7px;
+
+        margin-bottom: 16px;
+    }
+
+    .filtro-servicio {
+        padding: 7px 11px;
+
+        font-size: 11px;
+    }
+}
+
+/* ==========================================
+   COMPUTADORA
+========================================== */
+
+@media (min-width: 1000px) {
+    .servicio-card-body {
+        padding: 14px;
+    }
+
+    .servicio-nombre {
+        font-size: 14px;
+    }
+
+    .servicio-precio {
+        font-size: 18px;
+    }
 }
