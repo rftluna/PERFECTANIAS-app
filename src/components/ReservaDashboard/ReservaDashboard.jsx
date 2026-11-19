@@ -20,9 +20,10 @@ export const ReservaDashboard = () => {
     const esSeccionUnas = seccionActual === "unas";
     const mostrarModalSucursal = !seccionProximamente;
 
+    const cantidadTotalServicios = serviciosSeleccionados.reduce((acc, s) => acc + Math.max(1, Number(s.cantidad || 1)), 0);
     const totalReserva = getTotal();
     const senaHoy = Math.round(totalReserva * 0.5);
-    const minutosTotales = serviciosSeleccionados.reduce((acc, s) => acc + Number(s.duration || 90), 0);
+    const minutosTotales = serviciosSeleccionados.reduce((acc, s) => acc + Number(s.duration || 90) * Math.max(1, Number(s.cantidad || 1)), 0);
 
     const formatearMoneda = (valor) => Number(valor || 0).toLocaleString("es-AR");
 
@@ -146,7 +147,7 @@ export const ReservaDashboard = () => {
                                         Servicios
                                     </span>
 
-                                    {serviciosSeleccionados.length > 0 && (
+                                    {cantidadTotalServicios > 0 && (
                                         <span
                                             className="badge rounded-pill"
                                             style={{
@@ -157,26 +158,32 @@ export const ReservaDashboard = () => {
                                                 padding: "3px 8px"
                                             }}
                                         >
-                                            {serviciosSeleccionados.length}
+                                            {cantidadTotalServicios}
                                         </span>
                                     )}
                                 </div>
 
                                 {serviciosSeleccionados.length > 0 ? (
                                     <ul className="list-unstyled small mb-0">
-                                        {serviciosSeleccionados.map((s) => (
-                                            <li key={s.id} className="d-flex justify-content-between align-items-start gap-2 my-2 pb-2 border-bottom">
-                                                <div>
-                                                    <div className="fw-semibold text-dark">{s.name}</div>
-                                                    <span className="text-muted" style={{ fontSize: "11px" }}>
-                                                        {s.duration || 90} min · ${formatearMoneda(s.price)}
-                                                    </span>
-                                                </div>
-                                                <button type="button" onClick={() => toggleServicio(s)} className="btn btn-sm p-0 text-muted" title="Quitar servicio">
-                                                    <FaTimes />
-                                                </button>
-                                            </li>
-                                        ))}
+                                        {serviciosSeleccionados.map((s) => {
+                                            const cant = Math.max(1, Number(s.cantidad || 1));
+                                            const subtotal = Number(s.price || 0) * cant;
+                                            return (
+                                                <li key={s.id} className="d-flex justify-content-between align-items-start gap-2 my-2 pb-2 border-bottom">
+                                                    <div>
+                                                        <div className="fw-semibold text-dark">
+                                                            {s.name} {cant > 1 ? `(x${cant})` : ""}
+                                                        </div>
+                                                        <span className="text-muted" style={{ fontSize: "11px" }}>
+                                                            {s.duration || 90} min · ${formatearMoneda(subtotal)}
+                                                        </span>
+                                                    </div>
+                                                    <button type="button" onClick={() => toggleServicio(s)} className="btn btn-sm p-0 text-muted" title="Quitar servicio">
+                                                        <FaTimes />
+                                                    </button>
+                                                </li>
+                                            );
+                                        })}
                                     </ul>
                                 ) : (
                                     <p className="text-muted small m-0">Ningún tratamiento seleccionado aún.</p>

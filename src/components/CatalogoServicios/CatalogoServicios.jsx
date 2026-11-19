@@ -9,7 +9,7 @@ import "./CatalogoServicios.css";
 
 export const CatalogoServicios = () => {
     const { category } = useParams();
-    const { serviciosSeleccionados, toggleServicio } = useTurno();
+    const { serviciosSeleccionados, toggleServicio, ajustarCantidadServicio, getCantidadServicio } = useTurno();
 
     const [servicios, setServicios] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -109,7 +109,8 @@ export const CatalogoServicios = () => {
             {serviciosFiltrados.length > 0 ? (
                 <Row className="g-3">
                     {serviciosFiltrados.map((srv) => {
-                        const elegido = serviciosSeleccionados.some((s) => s.id === srv.id);
+                        const cantidad = getCantidadServicio(srv.id);
+                        const elegido = cantidad > 0 || serviciosSeleccionados.some((s) => s.id === srv.id);
                         const expandida = descripcionExpandida[srv.id] === true;
                         const precioNum = Number(srv.price || 0);
                         const senaNum = Math.round(precioNum * 0.5);
@@ -118,8 +119,15 @@ export const CatalogoServicios = () => {
                         const descripcion = typeof srv.description === "string" && srv.description.trim() ? srv.description.trim() : "Tratamiento estético personalizado realizado por especialistas.";
 
                         return (
-                            <Col xs={12} md={6} key={srv.id}> 
+                            <Col xs={12} md={6} key={srv.id}>
                                 <div className={`servicio-card-agendamas ${elegido ? "servicio-elegido" : ""}`} onClick={() => toggleServicio(srv)}>
+                                    {/* ENUMERADOR ROSA SOBRE LA ETIQUETA */}
+                                    {cantidad > 0 && (
+                                        <span className="enumerador-rosa-badge" aria-label={`Cantidad elegida: ${cantidad}`}>
+                                            {cantidad}
+                                        </span>
+                                    )}
+
                                     {/* FOTO CUADRADA DE IMGBB */}
                                     {srv.image && (
                                         <div className="servicio-thumb-cuadrada">
@@ -142,9 +150,21 @@ export const CatalogoServicios = () => {
 
                                         <p className={`servicio-descripcion ${expandida ? "expandida" : ""}`}>{descripcion}</p>
 
-                                        <button type="button" className="btn-ver-mas-link" onClick={(e) => manejarDescripcion(e, srv.id)}>
-                                            {expandida ? "Ver menos" : "Ver más"}
-                                        </button>
+                                        <div className="servicio-acciones-fila">
+                                            <button type="button" className="btn-ver-mas-link" onClick={(e) => manejarDescripcion(e, srv.id)}>
+                                                {expandida ? "Ver menos" : "Ver más"}
+                                            </button>
+
+                                            <div className="controles-cantidad-servicio" onClick={(e) => e.stopPropagation()}>
+                                                <button type="button" className="btn-cantidad-rosa" onClick={() => ajustarCantidadServicio(srv, -1)} aria-label="Restar cantidad">
+                                                    −
+                                                </button>
+                                                <span className="valor-cantidad-servicio">{cantidad}</span>
+                                                <button type="button" className="btn-cantidad-rosa" onClick={() => ajustarCantidadServicio(srv, 1)} aria-label="Sumar cantidad">
+                                                    +
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     {/* FLECHA O CHECK DE SELECCIÓN */}

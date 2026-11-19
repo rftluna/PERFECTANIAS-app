@@ -1,5 +1,4 @@
 import { createContext, useContext, useState } from "react";
-// Importamos Firebase con un bloque try/catch interno para evitar que congele la app
 import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { toast } from "react-toastify";
@@ -20,33 +19,116 @@ export const TurnoProvider = ({ children }) => {
     const [serviciosSeleccionados, setServiciosSeleccionados] = useState([]);
     const [fechaSeleccionada, setFechaSeleccionada] = useState("");
     const [horaSeleccionada, setHoraSeleccionada] = useState("");
+    const [asignacionesPorHora, setAsignacionesPorHora] = useState({});
     const [formaPago, setFormaPago] = useState("Transferencia bancaria");
-    const [datosCliente, setDatosCliente] = useState({ nombre: "", apellido: "", telefono: "", email: "", notas: "" });
+    const [datosCliente, setDatosCliente] = useState({
+        nombre: "",
+        apellido: "",
+        telefono: "",
+        email: "",
+        notas: ""
+    });
     const [loading, setLoading] = useState(false);
 
-    const getTotal = () => serviciosSeleccionados.reduce((sum, s) => sum + Number(s.price || 0), 0);
+    const getTotal = () => serviciosSeleccionados.reduce((sum, s) => sum + Number(s.price || 0) * Number(s.cantidad || 1), 0);
+
+    const getCantidadServicio = (servicioId) => {
+        const encontrado = serviciosSeleccionados.find((s) => s.id === servicioId);
+        return encontrado ? Number(encontrado.cantidad || 1) : 0;
+    };
 
     const toggleServicio = (servicio) => {
         setServiciosSeleccionados((prev) => {
             const existe = prev.some((s) => s.id === servicio.id);
             if (existe) {
+                setAsignacionesPorHora((horasPrev) => {
+                    const actualizado = { ...horasPrev };
+                    Object.keys(actualizado).forEach((horaKey) => {
+                        if (actualizado[horaKey]?.id === servicio.id) {
+                            delete actualizado[horaKey];
+                        }
+                    });
+                    return actualizado;
+                });
                 return prev.filter((s) => s.id !== servicio.id);
             }
-            return [...prev, servicio];
+            return [...prev, { ...servicio, cantidad: 1 }];
         });
     };
 
-    // Validación a prueba de fallos de red local (1 solo turno por horario y sucursal)
+    const ajustarCantidadServicio = (servicio, cambio) => {
+        setServiciosSeleccionados((prev) => {
+            const indice = prev.findIndex((s) => s.id === servicio.id);
+
+            if (indice === -1) {
+                if (cambio > 0) {
+                    return [...prev, { ...servicio, cantidad: 1 }];
+                }
+                return prev;
+            }
+
+            const actual = Number(prev[indice].cantidad || 1);
+            const nuevaCantidad = actual + cambio;
+
+            if (nuevaCantidad <= 0) {
+                setAsignacionesPorHora((horasPrev) => {
+                    const actualizado = { ...horasPrev };
+                    Object.keys(actualizado).forEach((horaKey) => {
+                        if (actualizado[horaKey]?.id === servicio.id) {
+                            delete actualizado[horaKey];
+                        }
+                    });
+                    return actualizado;
+                });
+                return prev.filter((s) => s.id !== servicio.id);
+            }
+
+            const copia = [...prev];
+            copia[indice] = { ...copia[indice], cantidad: nuevaCantidad };
+            return copia;
+        });
+    };
+
+    // Asigna 1 servicio a 1 hora (o libera la hora si servicio es null)
+    const asignarServicioAHora = (hora, servicio) => {
+        if (!hora) return;
+
+        const siguiente = { ...asignacionesPorHora };
+
+        if (!servicio) {
+            delete siguiente[hora];
+            setAsignacionesPorHora(siguiente);
+            const restantes = Object.keys(siguiente).sort();
+            setHoraSeleccionada(restantes[0] || "");
+            return;
+        }
+
+        Object.keys(siguiente).forEach((horaKey) => {
+            const mismoSlot = servicio.slotKey && siguiente[horaKey]?.slotKey === servicio.slotKey;
+            const mismoServicioSinSlot = !servicio.slotKey && siguiente[horaKey]?.id === servicio.id;
+            if (mismoSlot || mismoServicioSinSlot) {
+                delete siguiente[horaKey];
+            }
+        });
+
+        siguiente[hora] = {
+            slotKey: servicio.slotKey || `${servicio.id}`,
+            id: servicio.id,
+            name: servicio.name,
+            price: Number(servicio.price || 0),
+            duration: servicio.duration ?? null
+        };
+
+        setAsignacionesPorHora(siguiente);
+        const horasOrdenadas = Object.keys(siguiente).sort();
+        setHoraSeleccionada(horasOrdenadas[0] || hora);
+    };
+
     const verificarDisponibilidadHora = async (fecha, hora, sucursalId) => {
         try {
-            if (!db) return true; // Si Firebase no inició, permite avanzar para pruebas
+            if (!db) return true;
             const turnosRef = collection(db, "reservas");
-            const q = query(
-                turnosRef,
-                where("fecha", "==", fecha),
-                where("hora", "==", hora),
-                where("sucursalId", "==", sucursalId)
-            );
+            const q = query(turnosRef, where("fecha", "==", fecha), where("hora", "==", hora), where("sucursalId", "==", sucursalId));
             const snapshot = await getDocs(q);
             return snapshot.empty;
         } catch (error) {
@@ -66,10 +148,30 @@ export const TurnoProvider = ({ children }) => {
         }
 
         try {
+            const serviciosOrdenadosPorHora =
+                Object.keys(asignacionesPorHora).length > 0
+                    ? Object.entries(asignacionesPorHora)
+                          .sort(([horaA], [horaB]) => horaA.localeCompare(horaB))
+                          .map(([hora, srv]) => ({
+                              hora,
+                              id: srv.id,
+                              name: srv.name,
+                              price: srv.price,
+                              duration: srv.duration
+                          }))
+                    : serviciosSeleccionados.map((s) => ({
+                          hora: horaSeleccionada,
+                          id: s.id,
+                          name: s.name,
+                          price: s.price,
+                          cantidad: Number(s.cantidad || 1)
+                      }));
+
             const nuevoTurno = {
                 sucursalId: sucursal.id,
                 sucursalNombre: sucursal.nombre,
-                servicios: serviciosSeleccionados.map((s) => ({ id: s.id, name: s.name, price: s.price })),
+                servicios: serviciosOrdenadosPorHora,
+                asignacionesPorHora,
                 fecha: fechaSeleccionada,
                 hora: horaSeleccionada,
                 formaPago,
@@ -84,12 +186,12 @@ export const TurnoProvider = ({ children }) => {
 
             toast.success("🎉 ¡Tu turno ha sido reservado con éxito!");
 
-            // 🔥 LA CORRECCIÓN: Reseteamos absolutamente todo, incluida la sucursal
             setPaso(1);
             setServiciosSeleccionados([]);
             setFechaSeleccionada("");
             setHoraSeleccionada("");
-            setSucursal(null); // ← Esto obliga al Modal inicial a saltar de vuelta a la pantalla
+            setAsignacionesPorHora({});
+            setSucursal(null);
             setDatosCliente({ nombre: "", apellido: "", telefono: "", email: "", notas: "" });
         } catch (error) {
             toast.error("Error al guardar: " + error.message);
@@ -107,10 +209,14 @@ export const TurnoProvider = ({ children }) => {
                 setSucursal,
                 serviciosSeleccionados,
                 toggleServicio,
+                ajustarCantidadServicio,
+                getCantidadServicio,
                 fechaSeleccionada,
                 setFechaSeleccionada,
                 horaSeleccionada,
                 setHoraSeleccionada,
+                asignacionesPorHora,
+                asignarServicioAHora,
                 formaPago,
                 setFormaPago,
                 datosCliente,
