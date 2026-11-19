@@ -1,6 +1,7 @@
 import { useParams, useLocation } from "react-router-dom";
 import { useTurno } from "../../context/TurnoContext";
-import { FaTimes, FaChevronRight } from "react-icons/fa";
+import { FaTimes, FaChevronRight, FaShareAlt } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 import { ModalSucursal } from "../ModalSucursal/ModalSucursal";
 import { CatalogoServicios } from "../CatalogoServicios/CatalogoServicios";
@@ -12,17 +13,7 @@ export const ReservaDashboard = () => {
     const { category } = useParams();
     const { pathname } = useLocation();
 
-    const {
-        paso,
-        setPaso,
-        serviciosSeleccionados,
-        toggleServicio,
-        getTotal,
-        sucursal,
-        setSucursal,
-        fechaSeleccionada,
-        horaSeleccionada
-    } = useTurno();
+    const { paso, setPaso, serviciosSeleccionados, toggleServicio, getTotal, sucursal, setSucursal, fechaSeleccionada, horaSeleccionada } = useTurno();
 
     const seccionActual = category || pathname.replace(/^\/+/, "");
     const seccionProximamente = seccionActual === "unas" || seccionActual === "turnos";
@@ -31,12 +22,35 @@ export const ReservaDashboard = () => {
 
     const totalReserva = getTotal();
     const senaHoy = Math.round(totalReserva * 0.5);
-    const minutosTotales = serviciosSeleccionados.reduce(
-        (acc, s) => acc + Number(s.duration || 90),
-        0
-    );
+    const minutosTotales = serviciosSeleccionados.reduce((acc, s) => acc + Number(s.duration || 90), 0);
 
     const formatearMoneda = (valor) => Number(valor || 0).toLocaleString("es-AR");
+
+    const handleCompartir = async () => {
+        const urlActual = window.location.href;
+        const textoCompartir = sucursal ? `Reservá tu turno en Perfectanias (${sucursal.nombre}):` : "Reservá tu turno online en Perfectanias:";
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: "Perfectanias",
+                    text: textoCompartir,
+                    url: urlActual
+                });
+            } catch (error) {
+                if (error.name !== "AbortError") {
+                    console.error("Error al compartir:", error);
+                }
+            }
+        } else {
+            try {
+                await navigator.clipboard.writeText(urlActual);
+                toast.info("🔗 Enlace copiado al portapapeles.");
+            } catch {
+                toast.info("🔗 Copiá el enlace desde la barra del navegador.");
+            }
+        }
+    };
 
     return (
         <div className="container-fluid reserva-dashboard">
@@ -44,7 +58,7 @@ export const ReservaDashboard = () => {
             {mostrarModalSucursal && <ModalSucursal />}
 
             {/* ENCABEZADO DE PERFECTANIAS */}
-            <header className="perfectanias-header d-flex align-items-center justify-content-between flex-wrap gap-3 pb-3 mb-3 border-bottom">
+            <header className="perfectanias-header d-flex align-items-start justify-content-between flex-wrap gap-3 pb-3 mb-3 border-bottom">
                 <div className="d-flex align-items-center gap-3">
                     <img
                         src="https://i.ibb.co/JWgZFvtx/logo.png"
@@ -55,9 +69,7 @@ export const ReservaDashboard = () => {
 
                     <div className="perfectanias-info">
                         <h1 className="h3 fw-bold mb-0">Perfectanias</h1>
-                        <p className="perfectanias-subtitulo text-muted mb-1 small">
-                            Reservá tu turno online
-                        </p>
+                        <p className="perfectanias-subtitulo text-muted mb-1 small">Reservá tu turno online</p>
                         <div className="perfectanias-rating d-flex align-items-center gap-1 small">
                             <span className="text-dark">★★★★★</span>
                             <strong className="text-dark">5,0</strong>
@@ -66,14 +78,32 @@ export const ReservaDashboard = () => {
                     </div>
                 </div>
 
-                {sucursal && !seccionProximamente && (
-                    <button
-                        type="button"
-                        onClick={() => setSucursal(null)}
-                        className="btn btn-sm btn-light border rounded-pill px-3 text-muted"
-                    >
-                        Sucursal: <strong className="text-dark">{sucursal.nombre}</strong> ▾
-                    </button>
+                {/* BOTÓN COMPARTIR + SELECTOR DE SUCURSAL */}
+                {!seccionProximamente && (
+                    <div className="d-flex flex-column align-items-end gap-2">
+                        <button
+                            type="button"
+                            onClick={handleCompartir}
+                            title="Compartir enlace"
+                            aria-label="Compartir enlace"
+                            className="btn btn-light rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                            style={{
+                                width: "42px",
+                                height: "42px",
+                                border: "1px solid #f0e8ec",
+                                backgroundColor: "#ffffff",
+                                color: "#2c282c"
+                            }}
+                        >
+                            <FaShareAlt size={15} />
+                        </button>
+
+                        {sucursal && (
+                            <button type="button" onClick={() => setSucursal(null)} className="btn btn-sm btn-link text-decoration-none p-0 text-dark">
+                                <span className="text-muted">Sucursal:</span> <strong>{sucursal.nombre}</strong> ▾
+                            </button>
+                        )}
+                    </div>
                 )}
             </header>
 
@@ -83,15 +113,11 @@ export const ReservaDashboard = () => {
                     <h2>{esSeccionUnas ? "Uñas" : "Turnos"}</h2>
                     <div className="proximamente-decoracion">✨ ───────── ✨</div>
                     <h3>PRÓXIMAMENTE...</h3>
-                    <p>
-                        {esSeccionUnas
-                            ? "Estamos preparando nuevos servicios para vos."
-                            : "Pronto vas a poder consultar y administrar tus reservas."}
-                    </p>
+                    <p>{esSeccionUnas ? "Estamos preparando nuevos servicios para vos." : "Pronto vas a poder consultar y administrar tus reservas."}</p>
                 </section>
             ) : (
                 <div className="row g-4 mt-1">
-                    {/* COLUMNA IZQUIERDA: CATÁLOGO SIEMPRE VISIBLE EN PASO 1 Y 2 */}
+                    {/* COLUMNA IZQUIERDA */}
                     <div className="col-lg-8 col-md-7 col-12">
                         {(paso === 1 || paso === 2) && <CatalogoServicios />}
                         {paso === 3 && <CalendarioTurnos />}
@@ -104,9 +130,7 @@ export const ReservaDashboard = () => {
                         <div className="card p-4 shadow-sm border rounded-4 resumen-reserva bg-white">
                             <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
                                 <h5 className="fw-bold m-0 fs-6">Tu reserva</h5>
-                                {minutosTotales > 0 && (
-                                    <span className="text-muted small">{minutosTotales} min</span>
-                                )}
+                                {minutosTotales > 0 && <span className="text-muted small">{minutosTotales} min</span>}
                             </div>
 
                             {/* SERVICIOS SELECCIONADOS */}
@@ -118,22 +142,14 @@ export const ReservaDashboard = () => {
                                 {serviciosSeleccionados.length > 0 ? (
                                     <ul className="list-unstyled small mb-0">
                                         {serviciosSeleccionados.map((s) => (
-                                            <li
-                                                key={s.id}
-                                                className="d-flex justify-content-between align-items-start gap-2 my-2 pb-2 border-bottom"
-                                            >
+                                            <li key={s.id} className="d-flex justify-content-between align-items-start gap-2 my-2 pb-2 border-bottom">
                                                 <div>
                                                     <div className="fw-semibold text-dark">{s.name}</div>
                                                     <span className="text-muted" style={{ fontSize: "11px" }}>
                                                         {s.duration || 90} min · ${formatearMoneda(s.price)}
                                                     </span>
                                                 </div>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => toggleServicio(s)}
-                                                    className="btn btn-sm p-0 text-muted"
-                                                    title="Quitar servicio"
-                                                >
+                                                <button type="button" onClick={() => toggleServicio(s)} className="btn btn-sm p-0 text-muted" title="Quitar servicio">
                                                     <FaTimes />
                                                 </button>
                                             </li>
@@ -151,12 +167,7 @@ export const ReservaDashboard = () => {
                                         <span className="text-muted fw-semibold text-uppercase" style={{ fontSize: "11px" }}>
                                             Sucursal
                                         </span>
-                                        <button
-                                            type="button"
-                                            onClick={() => setSucursal(null)}
-                                            className="btn btn-link btn-sm p-0 text-decoration-none"
-                                            style={{ color: "#bd829d", fontSize: "12px" }}
-                                        >
+                                        <button type="button" onClick={() => setSucursal(null)} className="btn btn-link btn-sm p-0 text-decoration-none" style={{ color: "#bd829d", fontSize: "12px" }}>
                                             Cambiar
                                         </button>
                                     </div>
