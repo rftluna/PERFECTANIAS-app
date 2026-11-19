@@ -3,39 +3,36 @@ import { useParams } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { useTurno } from "../../context/TurnoContext";
-import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
-import { FaCheckCircle, FaPlusCircle } from "react-icons/fa";
+import { Container, Row, Col, Spinner } from "react-bootstrap";
+import { FaCheckCircle, FaChevronRight, FaSearch } from "react-icons/fa";
 import "./CatalogoServicios.css";
 
 export const CatalogoServicios = () => {
     const { category } = useParams();
-
-    const { serviciosSeleccionados, toggleServicio, setPaso } = useTurno();
+    const { serviciosSeleccionados, toggleServicio } = useTurno();
 
     const [servicios, setServicios] = useState([]);
     const [loading, setLoading] = useState(true);
     const [descripcionExpandida, setDescripcionExpandida] = useState({});
     const [filtroCategoria, setFiltroCategoria] = useState("todos");
+    const [busqueda, setBusqueda] = useState("");
 
     const esSeccionPestanas = category === "pestanas";
 
-    // Reiniciar filtro y descripciones al cambiar de sección
     useEffect(() => {
         setFiltroCategoria("todos");
         setDescripcionExpandida({});
+        setBusqueda("");
     }, [category]);
 
-    // Cargar servicios desde Firestore
     useEffect(() => {
         const fetchServicios = async () => {
             try {
                 const querySnapshot = await getDocs(collection(db, "servicios"));
-
                 const dataMapeada = querySnapshot.docs.map((doc) => ({
                     id: doc.id,
                     ...doc.data()
                 }));
-
                 setServicios(dataMapeada);
             } catch (error) {
                 console.error("Error al cargar servicios de Firestore:", error);
@@ -47,33 +44,39 @@ export const CatalogoServicios = () => {
         fetchServicios();
     }, []);
 
-    // Expandir o contraer descripción
-    const manejarDescripcion = (id) => {
+    const manejarDescripcion = (e, id) => {
+        e.stopPropagation(); // Evita que al tocar "Ver más" se seleccione/deseleccione el servicio
         setDescripcionExpandida((prev) => ({
             ...prev,
             [id]: !prev[id]
         }));
     };
 
-    // Filtrado de servicios
+    const formatearMoneda = (valor) => {
+        return Number(valor || 0).toLocaleString("es-AR");
+    };
+
+    // Filtrado por categoría y buscador
     const serviciosFiltrados = servicios.filter((srv) => {
-        if (!esSeccionPestanas) {
-            return true;
-        }
+        const coincideCategoria = !esSeccionPestanas
+            ? true
+            : filtroCategoria === "todos"
+                ? srv.category === "Modelado - Tratamientos" || srv.category === "Combos"
+                : srv.category === filtroCategoria;
 
-        if (filtroCategoria === "todos") {
-            return srv.category === "Modelado - Tratamientos" || srv.category === "Combos";
-        }
+        const termino = busqueda.trim().toLowerCase();
+        const coincideBusqueda =
+            !termino ||
+            (srv.name && srv.name.toLowerCase().includes(termino)) ||
+            (srv.description && srv.description.toLowerCase().includes(termino));
 
-        return srv.category === filtroCategoria;
+        return coincideCategoria && coincideBusqueda;
     });
 
-    // Cargando catálogo
     if (loading) {
         return (
             <div className="text-center py-5">
                 <Spinner animation="border" style={{ color: "#d4a3b8" }} />
-
                 <p className="text-muted mt-2 small">Cargando catálogo estético...</p>
             </div>
         );
@@ -81,97 +84,113 @@ export const CatalogoServicios = () => {
 
     return (
         <Container fluid className="p-0 catalogo-servicios">
-            <h4 className="fw-bold mb-3 catalogo-titulo">{esSeccionPestanas ? "Servicios de pestañas y cejas" : "Seleccioná los servicios"}</h4>
+            {/* CABECERA CON TÍTULO Y BUSCADOR */}
+            <div className="catalogo-header-bar">
+                <div>
+                    <h4 className="catalogo-titulo">
+                        {esSeccionPestanas ? "Elegí servicios de pestañas y cejas" : "Elegí servicios"}
+                    </h4>
+                    <p className="catalogo-subtitulo">Podés reservar uno o más servicios.</p>
+                </div>
 
-            {/* FILTROS DE PESTAÑAS */}
+                <div className="buscador-servicios-box">
+                    <input
+                        type="text"
+                        className="buscador-servicios-input"
+                        placeholder="Buscar servicio..."
+                        value={busqueda}
+                        onChange={(e) => setBusqueda(e.target.value)}
+                    />
+                    <FaSearch className="buscador-servicios-icon" />
+                </div>
+            </div>
+
+            {/* FILTROS */}
             {esSeccionPestanas && (
                 <div className="filtros-servicios">
-                    <button type="button" className={`filtro-servicio ${filtroCategoria === "todos" ? "activo" : ""}`} onClick={() => setFiltroCategoria("todos")}>
+                    <button
+                        type="button"
+                        className={`filtro-servicio ${filtroCategoria === "todos" ? "activo" : ""}`}
+                        onClick={() => setFiltroCategoria("todos")}
+                    >
                         Todos
                     </button>
-
-                    <button type="button" className={`filtro-servicio ${filtroCategoria === "Modelado - Tratamientos" ? "activo" : ""}`} onClick={() => setFiltroCategoria("Modelado - Tratamientos")}>
+                    <button
+                        type="button"
+                        className={`filtro-servicio ${filtroCategoria === "Modelado - Tratamientos" ? "activo" : ""}`}
+                        onClick={() => setFiltroCategoria("Modelado - Tratamientos")}
+                    >
                         Modelado - Tratamientos
                     </button>
-
-                    <button type="button" className={`filtro-servicio ${filtroCategoria === "Combos" ? "activo" : ""}`} onClick={() => setFiltroCategoria("Combos")}>
+                    <button
+                        type="button"
+                        className={`filtro-servicio ${filtroCategoria === "Combos" ? "activo" : ""}`}
+                        onClick={() => setFiltroCategoria("Combos")}
+                    >
                         Combos
                     </button>
                 </div>
             )}
 
-            {/* CATÁLOGO EN GRILLA */}
+            {/* GRILLA DE 2 COLUMNAS ESTILO AGENDAMAS */}
             {serviciosFiltrados.length > 0 ? (
-                <Row className="g-3 catalogo-grid">
+                <Row className="g-3">
                     {serviciosFiltrados.map((srv) => {
                         const elegido = serviciosSeleccionados.some((s) => s.id === srv.id);
-
                         const expandida = descripcionExpandida[srv.id] === true;
-
-                        const descripcionOriginal = typeof srv.description === "string" ? srv.description.trim() : "";
-
-                        const descripcion = descripcionOriginal || "La descripción de este servicio estará disponible próximamente.";
+                        const precioNum = Number(srv.price || 0);
+                        const senaNum = Math.round(precioNum * 0.5);
+                        const duracionTexto = srv.duration ? `${srv.duration} min` : "90 min";
+                        const descripcion =
+                            typeof srv.description === "string" && srv.description.trim()
+                                ? srv.description.trim()
+                                : "Tratamiento estético personalizado realizado por especialistas.";
 
                         return (
-                            <Col xs={10} md={40} lg={10} key={srv.id}>
-                                <Card className={`servicio-card ${elegido ? "servicio-elegido" : ""}`}>
-                                    {/* IMAGEN */}
-                                    <div className="servicio-imagen-container">
-                                        <img
-                                            src={srv.image}
-                                            alt={srv.name || "Servicio estético"}
-                                            className="servicio-imagen"
-                                            onError={(e) => {
-                                                e.currentTarget.style.display = "none";
-                                            }}
-                                        />
+                            <Col xs={12} md={6} key={srv.id}>
+                                <div
+                                    className={`servicio-card-agendamas ${elegido ? "servicio-elegido" : ""}`}
+                                    onClick={() => toggleServicio(srv)}
+                                >
+                                    {/* FOTO CUADRADA DE IMGBB */}
+                                    {srv.image && (
+                                        <div className="servicio-thumb-cuadrada">
+                                            <img
+                                                src={srv.image}
+                                                alt={srv.name || "Servicio"}
+                                                onError={(e) => {
+                                                    e.currentTarget.parentElement.style.display = "none";
+                                                }}
+                                            />
+                                        </div>
+                                    )}
 
-                                        {elegido && (
-                                            <div className="servicio-badge-elegido">
-                                                <FaCheckCircle />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* INFORMACIÓN */}
-                                    <Card.Body className="servicio-card-body">
+                                    {/* DATOS DEL SERVICIO */}
+                                    <div className="servicio-info-central">
                                         <h6 className="servicio-nombre">{srv.name}</h6>
-
-                                        <div className="servicio-precio">${srv.price}</div>
-
-                                        {/* DESCRIPCIÓN */}
-                                        <div className="servicio-descripcion-container">
-                                            <p id={`descripcion-${srv.id}`} className={`servicio-descripcion ${expandida ? "expandida" : ""}`}>
-                                                {descripcion}
-                                            </p>
-
-                                            <button
-                                                type="button"
-                                                className="btn-ver-descripcion"
-                                                aria-expanded={expandida}
-                                                aria-controls={`descripcion-${srv.id}`}
-                                                onClick={() => manejarDescripcion(srv.id)}
-                                            >
-                                                {expandida ? "Ver menos" : "Ver descripción"}
-                                            </button>
+                                        <div className="servicio-precio">${formatearMoneda(precioNum)}</div>
+                                        <div className="servicio-meta-sena">
+                                            {duracionTexto} · Seña ${formatearMoneda(senaNum)}
                                         </div>
 
-                                        {/* ELEGIR SERVICIO */}
-                                        <Button className={`btn-seleccionar-servicio ${elegido ? "seleccionado" : ""}`} onClick={() => toggleServicio(srv)}>
-                                            {elegido ? (
-                                                <>
-                                                    <FaCheckCircle />
-                                                    Quitar
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <FaPlusCircle />
-                                                    Elegir
-                                                </>
-                                            )}
-                                        </Button>
-                                    </Card.Body>
-                                </Card>
+                                        <p className={`servicio-descripcion ${expandida ? "expandida" : ""}`}>
+                                            {descripcion}
+                                        </p>
+
+                                        <button
+                                            type="button"
+                                            className="btn-ver-mas-link"
+                                            onClick={(e) => manejarDescripcion(e, srv.id)}
+                                        >
+                                            {expandida ? "Ver menos" : "Ver más"}
+                                        </button>
+                                    </div>
+
+                                    {/* FLECHA O CHECK DE SELECCIÓN */}
+                                    <div className="servicio-accion-derecha">
+                                        {elegido ? <FaCheckCircle /> : <FaChevronRight />}
+                                    </div>
+                                </div>
                             </Col>
                         );
                     })}
@@ -179,17 +198,7 @@ export const CatalogoServicios = () => {
             ) : (
                 <div className="catalogo-vacio">
                     <span>✨</span>
-
-                    <p>No hay servicios disponibles en esta categoría por el momento.</p>
-                </div>
-            )}
-
-            {/* AVANZAR AL CALENDARIO */}
-            {serviciosSeleccionados.length > 0 && (
-                <div className="text-end mt-4">
-                    <Button className="btn-siguiente-paso" onClick={() => setPaso(3)}>
-                        Siguiente paso ➔
-                    </Button>
+                    <p>No encontramos servicios que coincidan con tu búsqueda.</p>
                 </div>
             )}
         </Container>
