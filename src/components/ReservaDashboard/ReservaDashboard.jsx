@@ -1,6 +1,6 @@
 import { useParams, useLocation } from "react-router-dom";
 import { useTurno } from "../../context/TurnoContext";
-import { FaTimes, FaChevronRight, FaShareAlt } from "react-icons/fa";
+import { FaTimes, FaChevronRight } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 import { ModalSucursal } from "../ModalSucursal/ModalSucursal";
@@ -86,16 +86,22 @@ export const ReservaDashboard = () => {
                             onClick={handleCompartir}
                             title="Compartir enlace"
                             aria-label="Compartir enlace"
-                            className="btn btn-light rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                            className="btn rounded-circle d-flex align-items-center justify-content-center shadow-sm p-0"
                             style={{
                                 width: "42px",
                                 height: "42px",
-                                border: "1px solid #f0e8ec",
+                                border: "1px solid #ece4e8",
                                 backgroundColor: "#ffffff",
-                                color: "#2c282c"
+                                color: "#221f22"
                             }}
                         >
-                            <FaShareAlt size={15} />
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#221f22" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="18" cy="5" r="3" />
+                                <circle cx="6" cy="12" r="3" />
+                                <circle cx="18" cy="19" r="3" />
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                            </svg>
                         </button>
 
                         {sucursal && (
