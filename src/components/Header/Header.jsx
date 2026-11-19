@@ -25,4 +25,9 @@ export const Header = () => {
                 <div className="business-details">
                     <h1>Perfectanias</h1>
 
-                    <p className="business-subtitle
+                    <p className="business-subtitle">Reservá tu turno online</p>
+                </div>
+            </section>
+        </>
+    );
+};

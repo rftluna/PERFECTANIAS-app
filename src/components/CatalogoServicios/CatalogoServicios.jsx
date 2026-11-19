@@ -58,17 +58,10 @@ export const CatalogoServicios = () => {
 
     // Filtrado por categoría y buscador
     const serviciosFiltrados = servicios.filter((srv) => {
-        const coincideCategoria = !esSeccionPestanas
-            ? true
-            : filtroCategoria === "todos"
-                ? srv.category === "Modelado - Tratamientos" || srv.category === "Combos"
-                : srv.category === filtroCategoria;
+        const coincideCategoria = !esSeccionPestanas ? true : filtroCategoria === "todos" ? srv.category === "Modelado - Tratamientos" || srv.category === "Combos" : srv.category === filtroCategoria;
 
         const termino = busqueda.trim().toLowerCase();
-        const coincideBusqueda =
-            !termino ||
-            (srv.name && srv.name.toLowerCase().includes(termino)) ||
-            (srv.description && srv.description.toLowerCase().includes(termino));
+        const coincideBusqueda = !termino || (srv.name && srv.name.toLowerCase().includes(termino)) || (srv.description && srv.description.toLowerCase().includes(termino));
 
         return coincideCategoria && coincideBusqueda;
     });
@@ -87,20 +80,12 @@ export const CatalogoServicios = () => {
             {/* CABECERA CON TÍTULO Y BUSCADOR */}
             <div className="catalogo-header-bar">
                 <div>
-                    <h4 className="catalogo-titulo">
-                        {esSeccionPestanas ? "Elegí servicios de pestañas y cejas" : "Elegí servicios"}
-                    </h4>
+                    <h4 className="catalogo-titulo">{esSeccionPestanas ? "Elegí servicios de pestañas y cejas" : "Elegí servicios"}</h4>
                     <p className="catalogo-subtitulo">Podés reservar uno o más servicios.</p>
                 </div>
 
                 <div className="buscador-servicios-box">
-                    <input
-                        type="text"
-                        className="buscador-servicios-input"
-                        placeholder="Buscar servicio..."
-                        value={busqueda}
-                        onChange={(e) => setBusqueda(e.target.value)}
-                    />
+                    <input type="text" className="buscador-servicios-input" placeholder="Buscar servicio..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
                     <FaSearch className="buscador-servicios-icon" />
                 </div>
             </div>
@@ -108,25 +93,13 @@ export const CatalogoServicios = () => {
             {/* FILTROS */}
             {esSeccionPestanas && (
                 <div className="filtros-servicios">
-                    <button
-                        type="button"
-                        className={`filtro-servicio ${filtroCategoria === "todos" ? "activo" : ""}`}
-                        onClick={() => setFiltroCategoria("todos")}
-                    >
+                    <button type="button" className={`filtro-servicio ${filtroCategoria === "todos" ? "activo" : ""}`} onClick={() => setFiltroCategoria("todos")}>
                         Todos
                     </button>
-                    <button
-                        type="button"
-                        className={`filtro-servicio ${filtroCategoria === "Modelado - Tratamientos" ? "activo" : ""}`}
-                        onClick={() => setFiltroCategoria("Modelado - Tratamientos")}
-                    >
+                    <button type="button" className={`filtro-servicio ${filtroCategoria === "Modelado - Tratamientos" ? "activo" : ""}`} onClick={() => setFiltroCategoria("Modelado - Tratamientos")}>
                         Modelado - Tratamientos
                     </button>
-                    <button
-                        type="button"
-                        className={`filtro-servicio ${filtroCategoria === "Combos" ? "activo" : ""}`}
-                        onClick={() => setFiltroCategoria("Combos")}
-                    >
+                    <button type="button" className={`filtro-servicio ${filtroCategoria === "Combos" ? "activo" : ""}`} onClick={() => setFiltroCategoria("Combos")}>
                         Combos
                     </button>
                 </div>
@@ -140,18 +113,13 @@ export const CatalogoServicios = () => {
                         const expandida = descripcionExpandida[srv.id] === true;
                         const precioNum = Number(srv.price || 0);
                         const senaNum = Math.round(precioNum * 0.5);
-                        const duracionTexto = srv.duration ? `${srv.duration} min` : "90 min";
-                        const descripcion =
-                            typeof srv.description === "string" && srv.description.trim()
-                                ? srv.description.trim()
-                                : "Tratamiento estético personalizado realizado por especialistas.";
+                        const tieneDuracion = srv.duration !== undefined && srv.duration !== null && srv.duration !== "";
+                        const duracionTexto = tieneDuracion ? `${srv.duration} min` : null;
+                        const descripcion = typeof srv.description === "string" && srv.description.trim() ? srv.description.trim() : "Tratamiento estético personalizado realizado por especialistas.";
 
                         return (
-                            <Col xs={12} md={6} key={srv.id}>
-                                <div
-                                    className={`servicio-card-agendamas ${elegido ? "servicio-elegido" : ""}`}
-                                    onClick={() => toggleServicio(srv)}
-                                >
+                            <Col xs={12} md={6} key={srv.id}> 
+                                <div className={`servicio-card-agendamas ${elegido ? "servicio-elegido" : ""}`} onClick={() => toggleServicio(srv)}>
                                     {/* FOTO CUADRADA DE IMGBB */}
                                     {srv.image && (
                                         <div className="servicio-thumb-cuadrada">
@@ -169,27 +137,18 @@ export const CatalogoServicios = () => {
                                     <div className="servicio-info-central">
                                         <h6 className="servicio-nombre">{srv.name}</h6>
                                         <div className="servicio-precio">${formatearMoneda(precioNum)}</div>
-                                        <div className="servicio-meta-sena">
-                                            {duracionTexto} · Seña ${formatearMoneda(senaNum)}
-                                        </div>
 
-                                        <p className={`servicio-descripcion ${expandida ? "expandida" : ""}`}>
-                                            {descripcion}
-                                        </p>
+                                        <div className="servicio-meta-sena">{duracionTexto ? `${duracionTexto} · Seña $${formatearMoneda(senaNum)}` : `- Seña $${formatearMoneda(senaNum)}`}</div>
 
-                                        <button
-                                            type="button"
-                                            className="btn-ver-mas-link"
-                                            onClick={(e) => manejarDescripcion(e, srv.id)}
-                                        >
+                                        <p className={`servicio-descripcion ${expandida ? "expandida" : ""}`}>{descripcion}</p>
+
+                                        <button type="button" className="btn-ver-mas-link" onClick={(e) => manejarDescripcion(e, srv.id)}>
                                             {expandida ? "Ver menos" : "Ver más"}
                                         </button>
                                     </div>
 
                                     {/* FLECHA O CHECK DE SELECCIÓN */}
-                                    <div className="servicio-accion-derecha">
-                                        {elegido ? <FaCheckCircle /> : <FaChevronRight />}
-                                    </div>
+                                    <div className="servicio-accion-derecha">{elegido ? <FaCheckCircle /> : <FaChevronRight />}</div>
                                 </div>
                             </Col>
                         );

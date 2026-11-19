@@ -36,14 +36,19 @@ export const TurnoProvider = ({ children }) => {
         });
     };
 
-    // Validación a prueba de fallos de red local
+    // Validación a prueba de fallos de red local (1 solo turno por horario y sucursal)
     const verificarDisponibilidadHora = async (fecha, hora, sucursalId) => {
         try {
             if (!db) return true; // Si Firebase no inició, permite avanzar para pruebas
             const turnosRef = collection(db, "reservas");
-            const q = query(turnosRef, where("fecha", "==", fecha), where("hora", "==", hora), where("sucursalId", "==", sucursalId));
+            const q = query(
+                turnosRef,
+                where("fecha", "==", fecha),
+                where("hora", "==", hora),
+                where("sucursalId", "==", sucursalId)
+            );
             const snapshot = await getDocs(q);
-            return snapshot.size < 2;
+            return snapshot.empty;
         } catch (error) {
             console.warn("Firebase offline o reintentando, simulando cupo libre para desarrollo.");
             return true;

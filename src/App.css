@@ -486,3 +486,27 @@ main {
         font-size: 14px;
     }
 }
+/* ==========================================
+   PERFECTANIAS - DEGRADADO ROSA GLOBAL
+========================================== */
+
+html,
+body {
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #fdf7fa 45%,
+        #f9e6ee 85%,
+        #f5dbe6 100%
+    ) no-repeat fixed;
+    background-size: cover;
+}
+
+/* Asegura que los contenedores principales no tapen el degradado con un blanco sólido */
+.reserva-dashboard,
+.catalogo-servicios {
+    background-color: transparent !important;
+}

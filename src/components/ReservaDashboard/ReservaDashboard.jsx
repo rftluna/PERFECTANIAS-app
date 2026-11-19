@@ -141,9 +141,26 @@ export const ReservaDashboard = () => {
 
                             {/* SERVICIOS SELECCIONADOS */}
                             <div className="mb-3">
-                                <span className="text-muted d-block small fw-semibold text-uppercase mb-2" style={{ fontSize: "11px" }}>
-                                    Servicios ({serviciosSeleccionados.length})
-                                </span>
+                                <div className="d-flex align-items-center gap-2 mb-2">
+                                    <span className="text-muted small fw-semibold text-uppercase" style={{ fontSize: "11px" }}>
+                                        Servicios
+                                    </span>
+
+                                    {serviciosSeleccionados.length > 0 && (
+                                        <span
+                                            className="badge rounded-pill"
+                                            style={{
+                                                backgroundColor: "#d4a3b8",
+                                                color: "#ffffff",
+                                                fontSize: "11px",
+                                                fontWeight: 700,
+                                                padding: "3px 8px"
+                                            }}
+                                        >
+                                            {serviciosSeleccionados.length}
+                                        </span>
+                                    )}
+                                </div>
 
                                 {serviciosSeleccionados.length > 0 ? (
                                     <ul className="list-unstyled small mb-0">
