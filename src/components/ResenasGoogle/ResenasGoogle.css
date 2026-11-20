@@ -1,0 +1,327 @@
+/* ==========================================
+   RESEÑAS - ESTILO "OPINIONES" TIPO AGENDAMAS
+========================================== */
+
+/* ---------- Resumen en el encabezado ---------- */
+.resenas-google-placeholder {
+    height: 21px;
+}
+
+.resenas-resumen-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #221f22;
+    cursor: pointer;
+}
+
+.resenas-resumen-btn:hover .resenas-cantidad {
+    color: #c47d9d;
+    text-decoration: underline;
+}
+
+.resenas-cantidad {
+    color: #777777;
+}
+
+/* ---------- Estrellas con relleno parcial ---------- */
+.resenas-estrellas {
+    display: inline-flex;
+    gap: 1px;
+    line-height: 1;
+}
+
+.resenas-estrella {
+    position: relative;
+    display: inline-block;
+}
+
+.resenas-estrella-vacia {
+    color: #e6d9df;
+}
+
+.resenas-estrella-llena {
+    position: absolute;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    color: #221f22;
+}
+
+/* ---------- Ventana de opiniones ---------- */
+.opiniones-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background-color: rgba(34, 31, 34, 0.55);
+    animation: opiniones-fade 0.2s ease;
+}
+
+.opiniones-modal {
+    width: 100%;
+    max-width: 1100px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-radius: 28px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    animation: opiniones-subir 0.25s ease;
+}
+
+.opiniones-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 28px 12px;
+}
+
+.opiniones-encabezado h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #221f22;
+}
+
+.opiniones-cerrar {
+    border: none;
+    background: none;
+    font-size: 30px;
+    line-height: 1;
+    color: #555555;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.opiniones-cerrar:hover {
+    color: #c47d9d;
+}
+
+.opiniones-cuerpo {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 28px;
+    padding: 4px 28px 28px;
+    min-height: 0;
+    flex: 1;
+}
+
+/* Lista (con scroll propio) */
+.opiniones-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    padding-right: 12px;
+    max-height: calc(88vh - 110px);
+}
+
+.opinion-card {
+    padding: 18px 20px;
+    border: 1px solid #efe8ec;
+    border-radius: 16px;
+    background: #ffffff;
+}
+
+.opinion-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.opinion-cabecera strong {
+    font-size: 15px;
+    color: #221f22;
+}
+
+.opinion-fecha {
+    font-size: 13px;
+    color: #777777;
+    white-space: nowrap;
+}
+
+.opinion-texto {
+    margin: 10px 0 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #343434;
+    white-space: pre-line;
+}
+
+.opiniones-vacio {
+    color: #777777;
+    font-size: 14px;
+    padding: 20px 0;
+}
+
+/* Resumen de la derecha */
+.opiniones-resumen {
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 24px 28px 28px;
+    border-radius: 20px;
+    background-color: #f7f4f6;
+}
+
+.opiniones-puntaje-grande {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    color: #221f22;
+}
+
+.opiniones-puntaje-grande span {
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -1px;
+}
+
+.resenas-laurel {
+    color: #221f22;
+    flex-shrink: 0;
+}
+
+.opiniones-cantidad {
+    color: #555555;
+    font-size: 15px;
+    margin-bottom: 14px;
+}
+
+.opiniones-verificado {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    border: 1px solid #ece4e8;
+    border-radius: 14px;
+    background: #ffffff;
+    font-size: 13px;
+    color: #444444;
+}
+
+.opiniones-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border: 2px solid #2e9d6a;
+    border-radius: 50%;
+    color: #2e9d6a;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.opiniones-btn-dejar {
+    display: inline-block;
+    padding: 12px 56px;
+    border-radius: 999px;
+    background-color: #221f22;
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.opiniones-btn-dejar:hover {
+    background-color: #c47d9d;
+    color: #ffffff;
+}
+
+.opiniones-link-ver {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #c47d9d;
+    text-decoration: underline;
+}
+
+/* ---------- Celular y tablet ---------- */
+@media (max-width: 767px) {
+    .opiniones-overlay {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    .opiniones-modal {
+        max-height: 92vh;
+        border-radius: 24px 24px 0 0;
+    }
+
+    .opiniones-encabezado {
+        padding: 20px 20px 10px;
+    }
+
+    .opiniones-encabezado h2 {
+        font-size: 18px;
+    }
+
+    /* En celular: primero el resumen, abajo la lista, todo con un solo scroll */
+    .opiniones-cuerpo {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 18px;
+        padding: 4px 20px 24px;
+        overflow-y: auto;
+    }
+
+    .opiniones-lista {
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
+    }
+
+    .opiniones-resumen {
+        align-self: stretch;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .opiniones-puntaje-grande span {
+        font-size: 52px;
+    }
+
+    .opiniones-btn-dejar {
+        width: 100%;
+        text-align: center;
+        padding: 12px 20px;
+    }
+}
+
+@keyframes opiniones-fade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes opiniones-subir {
+    from {
+        transform: translateY(16px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

@@ -57,8 +57,12 @@ export const CatalogoServicios = () => {
     };
 
     // Filtrado por categoría y buscador
+    // Limpia la categoría: saca comillas y espacios de más, así un error de tipeo no esconde el servicio.
+    const normalizarCategoria = (cat) => String(cat || "").replace(/["'“”]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
+
     const serviciosFiltrados = servicios.filter((srv) => {
-        const coincideCategoria = !esSeccionPestanas ? true : filtroCategoria === "todos" ? srv.category === "Modelado - Tratamientos" || srv.category === "Combos" : srv.category === filtroCategoria;
+        const categoriaSrv = normalizarCategoria(srv.category);
+        const coincideCategoria = !esSeccionPestanas ? true : filtroCategoria === "todos" ? categoriaSrv === normalizarCategoria("Modelado - Tratamientos") || categoriaSrv === normalizarCategoria("Combos") : categoriaSrv === normalizarCategoria(filtroCategoria);
 
         const termino = busqueda.trim().toLowerCase();
         const coincideBusqueda = !termino || (srv.name && srv.name.toLowerCase().includes(termino)) || (srv.description && srv.description.toLowerCase().includes(termino));

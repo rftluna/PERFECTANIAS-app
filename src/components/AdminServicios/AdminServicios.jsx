@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { db } from "../../firebase/config";
 import { toast } from "react-toastify";
 import { ReservasAdmin } from "./ReservasAdmin";
+import { ResenasAdmin } from "./ResenasAdmin";
 
 const formInicial = {
     name: "",
@@ -65,7 +66,7 @@ export const AdminServicios = () => {
             name: srv.name || "",
             price: srv.price ?? "",
             duration: srv.duration ?? "60",
-            category: srv.category || "Modelado - Tratamientos",
+            category: String(srv.category || "Modelado - Tratamientos").replace(/["'“”]/g, "").trim(),
             description: srv.description || "",
             image: srv.image || ""
         });
@@ -88,7 +89,7 @@ export const AdminServicios = () => {
             name: form.name.trim(),
             price: Number(form.price || 0),
             duration: Number(form.duration || 60),
-            category: form.category.trim() || "Modelado - Tratamientos",
+            category: form.category.replace(/["'“”]/g, "").replace(/\s+/g, " ").trim() || "Modelado - Tratamientos",
             description: form.description.trim(),
             image: form.image.trim()
         };
@@ -140,7 +141,8 @@ export const AdminServicios = () => {
             <div className="d-flex gap-2 mb-4">
                 {[
                     { id: "reservas", texto: "📅 Reservas" },
-                    { id: "servicios", texto: "💅 Servicios" }
+                    { id: "servicios", texto: "💅 Servicios" },
+                    { id: "resenas", texto: "⭐ Reseñas" }
                 ].map((tab) => (
                     <button
                         key={tab.id}
@@ -160,6 +162,8 @@ export const AdminServicios = () => {
 
             {seccion === "reservas" ? (
                 <ReservasAdmin />
+            ) : seccion === "resenas" ? (
+                <ResenasAdmin />
             ) : (
             <div className="row g-4">
                 <div className="col-lg-5">

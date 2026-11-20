@@ -90,6 +90,26 @@ service cloud.firestore {
       allow update, delete: if esAdmin();
     }
 
+    // Configuración pública de la web (por ahora: puntaje y links de reseñas de Google).
+    // La lee cualquiera; solo la administradora la cambia.
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if esAdmin();
+    }
+
+    // Opiniones de clientas que se muestran en la web (las carga la administradora).
+    match /resenas/{resenaId} {
+      allow read: if true;
+      allow create, update: if esAdmin()
+        && request.resource.data.keys().hasOnly(['nombre', 'fecha', 'estrellas', 'texto'])
+        && textoValido(request.resource.data.nombre, 60)
+        && fechaValida(request.resource.data.fecha)
+        && request.resource.data.estrellas is number
+        && request.resource.data.estrellas >= 1 && request.resource.data.estrellas <= 5
+        && request.resource.data.texto is string && request.resource.data.texto.size() <= 1500;
+      allow delete: if esAdmin();
+    }
+
     // Cualquier otra colección queda bloqueada (no hay regla = acceso denegado).
   }
 }

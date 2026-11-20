@@ -8,6 +8,7 @@ import { CatalogoServicios } from "../CatalogoServicios/CatalogoServicios";
 import { CalendarioTurnos } from "../CalendarioTurnos/CalendarioTurnos";
 import { FormaPago } from "../FormaPago/FormaPago";
 import { FormularioCliente } from "../FormularioCliente/FormularioCliente";
+import { ResenasGoogle } from "../ResenasGoogle/ResenasGoogle";
 
 export const ReservaDashboard = () => {
     const { category } = useParams();
@@ -71,11 +72,8 @@ export const ReservaDashboard = () => {
                     <div className="perfectanias-info">
                         <h1 className="h3 fw-bold mb-0">Perfectanias</h1>
                         <p className="perfectanias-subtitulo text-muted mb-1 small">Reservá tu turno online</p>
-                        <div className="perfectanias-rating d-flex align-items-center gap-1 small">
-                            <span className="text-dark">★★★★★</span>
-                            <strong className="text-dark">5,0</strong>
-                            <span className="text-muted">(2)</span>
-                        </div>
+                        {/* Puntaje y reseñas de Google (se editan desde /admin → Reseñas) */}
+                        <ResenasGoogle />
                     </div>
                 </div>
 
