@@ -28,6 +28,8 @@ export const AdminServicios = () => {
     const [form, setForm] = useState(formInicial);
     const [guardando, setGuardando] = useState(false);
     const [seccion, setSeccion] = useState("reservas");
+    const [ordenServicios, setOrdenServicios] = useState("recomendados");
+    const [filtroCategoriaAdmin, setFiltroCategoriaAdmin] = useState("todos");
 
     const cargarServicios = async () => {
         setLoadingServicios(true);
@@ -48,6 +50,27 @@ export const AdminServicios = () => {
             cargarServicios();
         }
     }, [usuario]);
+
+    // Filtros y orden de la lista "Servicios cargados" (mismos que en Pestañas).
+    const normalizarCat = (cat) => String(cat || "").replace(/["'“”]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
+    const compararNombre = (a, b) => String(a.name || "").localeCompare(String(b.name || ""), "es", { sensitivity: "base" });
+
+    const serviciosVisibles = servicios
+        .filter((srv) => filtroCategoriaAdmin === "todos" || normalizarCat(srv.category) === normalizarCat(filtroCategoriaAdmin))
+        .sort((a, b) => {
+            if (ordenServicios === "precio-asc") return Number(a.price || 0) - Number(b.price || 0) || compararNombre(a, b);
+            if (ordenServicios === "precio-desc") return Number(b.price || 0) - Number(a.price || 0) || compararNombre(a, b);
+            if (ordenServicios === "az") return compararNombre(a, b);
+            if (ordenServicios === "za") return compararNombre(b, a);
+            return 0;
+        });
+
+    const estiloChip = (activo) => ({
+        backgroundColor: activo ? "#d4a3b8" : "#fff7fa",
+        color: activo ? "#ffffff" : "#bd829d",
+        border: `1px solid ${activo ? "#d4a3b8" : "#ead1dc"}`,
+        fontSize: "12px"
+    });
 
     const handleLogout = async () => {
         await logout();
@@ -242,14 +265,49 @@ export const AdminServicios = () => {
 
                 <div className="col-lg-7">
                     <div className="card p-4 shadow-sm border rounded-4 bg-white">
-                        <h5 className="fw-bold mb-3">Servicios cargados ({servicios.length})</h5>
+                        <h5 className="fw-bold mb-3">
+                            Servicios cargados ({serviciosVisibles.length}
+                            {serviciosVisibles.length !== servicios.length ? ` de ${servicios.length}` : ""})
+                        </h5>
+
+                        {/* FILTROS Y ORDEN */}
+                        <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                            <div className="d-flex flex-wrap gap-2">
+                                {[
+                                    { id: "todos", texto: "Todos" },
+                                    { id: "Modelado - Tratamientos", texto: "Modelado - Tratamientos" },
+                                    { id: "Combos", texto: "Combos" }
+                                ].map((f) => (
+                                    <button key={f.id} type="button" onClick={() => setFiltroCategoriaAdmin(f.id)} className="btn btn-sm rounded-pill px-3 fw-semibold" style={estiloChip(filtroCategoriaAdmin === f.id)}>
+                                        {f.texto}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <label className="d-inline-flex align-items-center gap-2 m-0 small fw-semibold" style={{ color: "#987587" }}>
+                                Ordenar:
+                                <select
+                                    value={ordenServicios}
+                                    onChange={(e) => setOrdenServicios(e.target.value)}
+                                    className="form-select form-select-sm rounded-pill fw-semibold"
+                                    style={{ width: "auto", borderColor: "#ead1dc", color: "#bd829d", fontSize: "12px" }}
+                                    aria-label="Ordenar servicios"
+                                >
+                                    <option value="recomendados">Recomendados</option>
+                                    <option value="precio-asc">Menor precio</option>
+                                    <option value="precio-desc">Mayor precio</option>
+                                    <option value="az">Nombre: A → Z</option>
+                                    <option value="za">Nombre: Z → A</option>
+                                </select>
+                            </label>
+                        </div>
                         {loadingServicios ? (
                             <p className="text-muted small">Cargando servicios...</p>
-                        ) : servicios.length === 0 ? (
-                            <p className="text-muted small">Todavía no hay servicios cargados.</p>
+                        ) : serviciosVisibles.length === 0 ? (
+                            <p className="text-muted small">{servicios.length === 0 ? "Todavía no hay servicios cargados." : "No hay servicios en esta categoría."}</p>
                         ) : (
                             <div className="d-flex flex-column gap-3">
-                                {servicios.map((srv) => (
+                                {serviciosVisibles.map((srv) => (
                                     <div key={srv.id} className="d-flex justify-content-between align-items-center gap-3 p-3 border rounded-3">
                                         <div className="d-flex align-items-center gap-3">
                                             {srv.image && (
