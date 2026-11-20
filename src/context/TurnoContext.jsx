@@ -171,6 +171,7 @@ export const TurnoProvider = ({ children }) => {
             const totalCalculado = getTotal();
             const senaCalculada = Math.round(totalCalculado * 0.5);
             const formatearMonto = (num) => Number(num || 0).toLocaleString("es-AR");
+            const emailDestino = (datosCliente?.email || "").trim();
 
             const nuevoTurno = {
                 sucursalId: sucursal.id,
@@ -180,7 +181,10 @@ export const TurnoProvider = ({ children }) => {
                 fecha: fechaSeleccionada,
                 hora: horaSeleccionada,
                 formaPago: "Transferencia bancaria",
-                cliente: datosCliente,
+                cliente: {
+                    ...datosCliente,
+                    email: emailDestino
+                },
                 total: totalCalculado,
                 sena: senaCalculada,
                 createdAt: new Date().toISOString()
@@ -191,9 +195,9 @@ export const TurnoProvider = ({ children }) => {
             }
 
             // Envío de confirmación por email con EmailJS
-            const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-            const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-            const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+            const serviceId = (import.meta.env.VITE_EMAILJS_SERVICE_ID || "").trim();
+            const templateId = (import.meta.env.VITE_EMAILJS_TEMPLATE_ID || "").trim();
+            const publicKey = (import.meta.env.VITE_EMAILJS_PUBLIC_KEY || "").trim();
 
             const resumenServiciosTexto = serviciosOrdenadosPorHora
                 .map((item) => {
@@ -203,13 +207,13 @@ export const TurnoProvider = ({ children }) => {
                 })
                 .join("\n");
 
-            if (datosCliente?.email && serviceId && templateId && publicKey) {
+            if (emailDestino && serviceId && templateId && publicKey) {
                 try {
                     await emailjs.send(
                         serviceId,
                         templateId,
                         {
-                            to_email: datosCliente.email,
+                            to_email: emailDestino,
                             cliente_nombre: `${datosCliente.nombre || ""} ${datosCliente.apellido || ""}`.trim(),
                             sucursal_nombre: sucursal?.nombre || "",
                             fecha: fechaSeleccionada,
@@ -224,9 +228,16 @@ export const TurnoProvider = ({ children }) => {
                         }
                     );
                 } catch (emailError) {
-                    console.warn("Turno guardado, pero falló el envío del correo:", emailError);
+                    console.warn("Turno guardado, pero falló el envío del correo:", emailError?.text || emailError?.message || emailError);
                     toast.info("Turno reservado, aunque no pudimos enviar el correo automático.");
                 }
+            } else {
+                console.warn("No se llamó a EmailJS. Estado de datos:", {
+                    tieneEmail: Boolean(emailDestino),
+                    tieneServiceId: Boolean(serviceId),
+                    tieneTemplateId: Boolean(templateId),
+                    tienePublicKey: Boolean(publicKey)
+                });
             }
 
             toast.success("🎉 ¡Tu turno ha sido reservado con éxito!");
