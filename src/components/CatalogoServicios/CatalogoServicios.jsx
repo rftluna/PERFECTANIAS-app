@@ -16,6 +16,7 @@ export const CatalogoServicios = () => {
     const [descripcionExpandida, setDescripcionExpandida] = useState({});
     const [filtroCategoria, setFiltroCategoria] = useState("todos");
     const [busqueda, setBusqueda] = useState("");
+    const [orden, setOrden] = useState("recomendados");
 
     const esSeccionPestanas = category === "pestanas";
 
@@ -23,6 +24,7 @@ export const CatalogoServicios = () => {
         setFiltroCategoria("todos");
         setDescripcionExpandida({});
         setBusqueda("");
+        setOrden("recomendados");
     }, [category]);
 
     useEffect(() => {
@@ -62,13 +64,26 @@ export const CatalogoServicios = () => {
 
     const serviciosFiltrados = servicios.filter((srv) => {
         const categoriaSrv = normalizarCategoria(srv.category);
-        const coincideCategoria = !esSeccionPestanas ? true : filtroCategoria === "todos" ? categoriaSrv === normalizarCategoria("Modelado - Tratamientos") || categoriaSrv === normalizarCategoria("Combos") : categoriaSrv === normalizarCategoria(filtroCategoria);
+        // En "Todos" se muestran todos los servicios cargados (aunque tengan otra categoría).
+        const coincideCategoria = !esSeccionPestanas || filtroCategoria === "todos" ? true : categoriaSrv === normalizarCategoria(filtroCategoria);
 
         const termino = busqueda.trim().toLowerCase();
         const coincideBusqueda = !termino || (srv.name && srv.name.toLowerCase().includes(termino)) || (srv.description && srv.description.toLowerCase().includes(termino));
 
         return coincideCategoria && coincideBusqueda;
     });
+
+    // Orden elegido por la clienta (solo en la sección Pestañas).
+    const compararNombre = (a, b) => String(a.name || "").localeCompare(String(b.name || ""), "es", { sensitivity: "base" });
+    const serviciosOrdenados = !esSeccionPestanas || orden === "recomendados"
+        ? serviciosFiltrados
+        : [...serviciosFiltrados].sort((a, b) => {
+              if (orden === "precio-asc") return Number(a.price || 0) - Number(b.price || 0) || compararNombre(a, b);
+              if (orden === "precio-desc") return Number(b.price || 0) - Number(a.price || 0) || compararNombre(a, b);
+              if (orden === "az") return compararNombre(a, b);
+              if (orden === "za") return compararNombre(b, a);
+              return 0;
+          });
 
     if (loading) {
         return (
@@ -94,8 +109,9 @@ export const CatalogoServicios = () => {
                 </div>
             </div>
 
-            {/* FILTROS */}
+            {/* FILTROS Y ORDEN (solo en Pestañas) */}
             {esSeccionPestanas && (
+                <div className="filtros-y-orden">
                 <div className="filtros-servicios">
                     <button type="button" className={`filtro-servicio ${filtroCategoria === "todos" ? "activo" : ""}`} onClick={() => setFiltroCategoria("todos")}>
                         Todos
@@ -107,12 +123,24 @@ export const CatalogoServicios = () => {
                         Combos
                     </button>
                 </div>
+
+                <label className="orden-servicios">
+                    <span>Ordenar:</span>
+                    <select value={orden} onChange={(e) => setOrden(e.target.value)} aria-label="Ordenar servicios">
+                        <option value="recomendados">Recomendados</option>
+                        <option value="precio-asc">Menor precio</option>
+                        <option value="precio-desc">Mayor precio</option>
+                        <option value="az">Nombre: A → Z</option>
+                        <option value="za">Nombre: Z → A</option>
+                    </select>
+                </label>
+                </div>
             )}
 
             {/* GRILLA DE 2 COLUMNAS ESTILO AGENDAMAS */}
-            {serviciosFiltrados.length > 0 ? (
+            {serviciosOrdenados.length > 0 ? (
                 <Row className="g-3">
-                    {serviciosFiltrados.map((srv) => {
+                    {serviciosOrdenados.map((srv) => {
                         const cantidad = getCantidadServicio(srv.id);
                         const elegido = cantidad > 0 || serviciosSeleccionados.some((s) => s.id === srv.id);
                         const expandida = descripcionExpandida[srv.id] === true;
