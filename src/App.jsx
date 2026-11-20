@@ -19,7 +19,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
 function App() {
     return (
         <TurnoProvider>
-            <div className="d-flex flex-column min-vh-100 bg-white">
+            <div className="d-flex flex-column min-vh-100 app-contenedor">
                 {/* CONTENEDOR DE ALERTAS ANIMADAS (Toastify) */}
                 <ToastContainer position="top-right" autoClose={2500} theme="colored" />
 

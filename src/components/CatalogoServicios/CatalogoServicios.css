@@ -314,3 +314,9 @@
     border-radius: 16px;
     color: #987587;
 }
+
+/* Tarjetas blancas con sombra suave para que resalten sobre el degradado rosa */
+.catalogo-servicios .servicio-card-agendamas {
+    border-color: #f1e3e9;
+    box-shadow: 0 4px 14px rgba(196, 125, 157, 0.1);
+}

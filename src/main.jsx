@@ -3,13 +3,16 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
 import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 
-// 🔥 LA SOLUCIÓN DEFINITIVA: Envolvemos el BrowserRouter estrictamente acá,
-// garantizando que React-Bootstrap y React-Router compartan el mismo contexto global.
+// BrowserRouter envuelve toda la app (React-Router + React-Bootstrap comparten contexto).
+// AuthProvider da la sesión de la administradora a Login y ProtectedRoute.
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>,
 );

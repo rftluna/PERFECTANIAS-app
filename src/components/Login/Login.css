@@ -1,65 +1,99 @@
-/* ---------------- LOGIN ---------------- */
+/* ---------------- LOGIN ADMINISTRADORA (estética rosa Perfectanías) ---------------- */
+
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 3.5rem 1rem;
+  background-color: var(--rosa-fondo, #fff9fb);
+  min-height: 100%;
+}
 
 .login-form {
   max-width: 420px;
   width: 100%;
+  padding: 2.25rem 2rem;
 
-  margin: 4rem auto;
-  padding: 2rem;
-
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  background: #ffffff;
+  border: 1px solid var(--borde-suave, #f1e3e9);
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(212, 163, 184, 0.22);
 }
 
 .login-form h2 {
-  margin-bottom: 2rem;
+  margin-bottom: 0.35rem;
   text-align: center;
-  color: var(--text);
+  font-weight: 700;
+  color: #c47d9d;
+}
+
+.login-form .login-subtitulo {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--texto-secundario, #777777);
+  margin-bottom: 1.75rem;
 }
 
 .login-form .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.2rem;
+  gap: 0.45rem;
+  margin-bottom: 1.1rem;
 }
 
 .login-form label {
   font-weight: 600;
-  color: var(--text);
+  font-size: 0.9rem;
+  color: var(--texto-principal, #343434);
 }
 
 .login-form input {
   width: 100%;
-  padding: 0.8rem 1rem;
+  padding: 0.75rem 1rem;
 
-  background: var(--card);
-  color: var(--text);
+  background: #ffffff;
+  color: var(--texto-principal, #343434);
 
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid #ece4e8;
+  border-radius: 10px;
 
   font: inherit;
-
-  transition: 0.25s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .login-form input:focus {
   outline: none;
-
-  border-color: var(--primary);
-
-  box-shadow: 0 0 0 3px rgba(244, 162, 97, 0.2);
+  border-color: var(--rosa-principal, #d4a3b8);
+  box-shadow: 0 0 0 3px rgba(212, 163, 184, 0.25);
 }
+
 .login-form input::placeholder {
-  color: #b9c2d1;
+  color: #c9b8c0;
   opacity: 1;
 }
 
-.login-form button {
+.login-form .btn-login-rosa {
   width: 100%;
-  margin-top: 1rem;
+  margin-top: 0.75rem;
+  padding: 0.7rem 1rem;
+
+  background-color: var(--rosa-principal, #d4a3b8);
+  color: #ffffff;
+  font-weight: 700;
+
+  border: none;
+  border-radius: 999px;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.login-form .btn-login-rosa:hover:not(:disabled) {
+  background-color: #c47d9d;
+}
+
+.login-form .btn-login-rosa:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.login-form .btn-login-rosa:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }

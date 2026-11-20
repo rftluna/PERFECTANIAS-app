@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import { db } from "../../firebase/config";
 import { toast } from "react-toastify";
+import { ReservasAdmin } from "./ReservasAdmin";
 
 const formInicial = {
     name: "",
@@ -14,26 +16,16 @@ const formInicial = {
 };
 
 export const AdminServicios = () => {
-    const auth = getAuth();
-    const [usuario, setUsuario] = useState(null);
-    const [authCargando, setAuthCargando] = useState(true);
-    const [emailLogin, setEmailLogin] = useState("");
-    const [passwordLogin, setPasswordLogin] = useState("");
-    const [loginLoading, setLoginLoading] = useState(false);
+    // La sesión viene del AuthContext (el login rosa está en /admin/login).
+    const { user: usuario, logout } = useAuth();
+    const navigate = useNavigate();
 
     const [servicios, setServicios] = useState([]);
     const [loadingServicios, setLoadingServicios] = useState(false);
     const [editandoId, setEditandoId] = useState(null);
     const [form, setForm] = useState(formInicial);
     const [guardando, setGuardando] = useState(false);
-
-    useEffect(() => {
-        const unsub = onAuthStateChanged(auth, (user) => {
-            setUsuario(user);
-            setAuthCargando(false);
-        });
-        return () => unsub();
-    }, [auth]);
+    const [seccion, setSeccion] = useState("reservas");
 
     const cargarServicios = async () => {
         setLoadingServicios(true);
@@ -55,25 +47,11 @@ export const AdminServicios = () => {
         }
     }, [usuario]);
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setLoginLoading(true);
-        try {
-            await signInWithEmailAndPassword(auth, emailLogin.trim(), passwordLogin);
-            toast.success("Bienvenida al panel de Perfectanias.");
-            setEmailLogin("");
-            setPasswordLogin("");
-        } catch (err) {
-            toast.error("Credenciales inválidas: " + err.message);
-        } finally {
-            setLoginLoading(false);
-        }
-    };
-
     const handleLogout = async () => {
-        await signOut(auth);
+        await logout();
         setEditandoId(null);
         setForm(formInicial);
+        navigate("/admin/login", { replace: true });
     };
 
     const handleChange = (e) => {
@@ -144,40 +122,12 @@ export const AdminServicios = () => {
         }
     };
 
-    if (authCargando) {
-        return <div className="container py-5 text-center text-muted">Verificando acceso...</div>;
-    }
-
-    if (!usuario) {
-        return (
-            <div className="container py-5" style={{ maxWidth: "420px" }}>
-                <div className="card p-4 shadow-sm border rounded-4 bg-white">
-                    <h4 className="fw-bold mb-1">Panel Administradora</h4>
-                    <p className="text-muted small mb-4">Ingresá con tu cuenta para editar precios, textos y fotos.</p>
-                    <form onSubmit={handleLogin} className="d-flex flex-column gap-3">
-                        <div>
-                            <label className="form-label small fw-semibold">Correo electrónico</label>
-                            <input type="email" className="form-control" required value={emailLogin} onChange={(e) => setEmailLogin(e.target.value)} />
-                        </div>
-                        <div>
-                            <label className="form-label small fw-semibold">Contraseña</label>
-                            <input type="password" className="form-control" required value={passwordLogin} onChange={(e) => setPasswordLogin(e.target.value)} />
-                        </div>
-                        <button type="submit" disabled={loginLoading} className="btn rounded-pill fw-bold py-2 border-0" style={{ backgroundColor: "#d4a3b8", color: "#ffffff" }}>
-                            {loginLoading ? "Ingresando..." : "Ingresar"}
-                        </button>
-                    </form>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="container py-4">
             <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 pb-3 mb-4 border-bottom">
                 <div>
                     <h4 className="fw-bold m-0" style={{ color: "#e358ed" }}>
-                        Gestión de Servicios — Perfectanias
+                        Panel de Perfectanias
                     </h4>
                     <small className="text-muted">Sesión: {usuario.email}</small>
                 </div>
@@ -186,6 +136,31 @@ export const AdminServicios = () => {
                 </button>
             </div>
 
+            {/* PESTAÑAS DEL PANEL */}
+            <div className="d-flex gap-2 mb-4">
+                {[
+                    { id: "reservas", texto: "📅 Reservas" },
+                    { id: "servicios", texto: "💅 Servicios" }
+                ].map((tab) => (
+                    <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setSeccion(tab.id)}
+                        className="btn rounded-pill px-4 fw-semibold"
+                        style={{
+                            backgroundColor: seccion === tab.id ? "#d4a3b8" : "#fff0f5",
+                            color: seccion === tab.id ? "#ffffff" : "#c47d9d",
+                            border: "none"
+                        }}
+                    >
+                        {tab.texto}
+                    </button>
+                ))}
+            </div>
+
+            {seccion === "reservas" ? (
+                <ReservasAdmin />
+            ) : (
             <div className="row g-4">
                 <div className="col-lg-5">
                     <div className="card p-4 shadow-sm border rounded-4 bg-white">
@@ -306,6 +281,7 @@ export const AdminServicios = () => {
                     </div>
                 </div>
             </div>
+            )}
         </div>
     );
 };

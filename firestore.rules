@@ -1,0 +1,95 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- FUNCIONES AUXILIARES ----------
+
+    // Solo la cuenta de la administradora (por UID: sigue valiendo aunque cambie email o clave).
+    function esAdmin() {
+      return request.auth != null
+        && request.auth.uid == 'OgWsAMKDYgQN8AhgDwjSvIzfjq72';
+    }
+
+    function textoValido(valor, maximo) {
+      return valor is string && valor.size() > 0 && valor.size() <= maximo;
+    }
+
+    function fechaValida(valor) {
+      return valor is string && valor.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+    }
+
+    function horaValida(valor) {
+      return valor is string && valor.matches('^[0-9]{2}:[0-9]{2}$');
+    }
+
+    // Datos de la clienta dentro de la reserva.
+    function clienteValido(c) {
+      return c is map
+        && c.keys().hasOnly(['nombre', 'apellido', 'telefono', 'email', 'notas'])
+        && textoValido(c.nombre, 60)
+        && textoValido(c.apellido, 60)
+        && textoValido(c.telefono, 30)
+        && textoValido(c.email, 120)
+        && (!('notas' in c) || (c.notas is string && c.notas.size() <= 500));
+    }
+
+    // Estructura exacta que genera finalizarReserva() en TurnoContext.
+    function reservaValida(d) {
+      return d.keys().hasOnly([
+          'sucursalId', 'sucursalNombre', 'servicios', 'asignacionesPorHora',
+          'fecha', 'hora', 'formaPago', 'cliente', 'total', 'sena', 'createdAt'
+        ])
+        && d.keys().hasAll(['sucursalId', 'servicios', 'fecha', 'hora', 'cliente', 'total', 'createdAt'])
+        && textoValido(d.sucursalId, 60)
+        && fechaValida(d.fecha)
+        && horaValida(d.hora)
+        && d.servicios is list && d.servicios.size() > 0 && d.servicios.size() <= 20
+        && (!('asignacionesPorHora' in d) || d.asignacionesPorHora is map)
+        && (!('sucursalNombre' in d) || textoValido(d.sucursalNombre, 80))
+        && (!('formaPago' in d) || textoValido(d.formaPago, 60))
+        && clienteValido(d.cliente)
+        && d.total is number && d.total >= 0
+        && (!('sena' in d) || (d.sena is number && d.sena >= 0))
+        && d.createdAt is string;
+    }
+
+    // Un horario ocupado: solo fecha, hora, sucursal y ocupado = true.
+    // El ID tiene que ser fecha_sucursal_hora (ej: 2026-11-21_casanova_1300).
+    function horarioValido(slotId, d) {
+      return d.keys().hasOnly(['fecha', 'hora', 'sucursalId', 'ocupado'])
+        && d.keys().hasAll(['fecha', 'hora', 'sucursalId', 'ocupado'])
+        && d.ocupado == true
+        && fechaValida(d.fecha)
+        && horaValida(d.hora)
+        && textoValido(d.sucursalId, 60)
+        && slotId == d.fecha + '_' + d.sucursalId + '_' + d.hora.replace(':', '');
+    }
+
+    // ---------- COLECCIONES ----------
+
+    // Catálogo: lo ve todo el mundo, lo edita solo la administradora.
+    match /servicios/{servicioId} {
+      allow read: if true;
+      allow write: if esAdmin();
+    }
+
+    // Reservas: datos privados de las clientas.
+    // Cualquiera puede CREAR una reserva válida; solo la administradora la ve, edita o borra.
+    match /reservas/{reservaId} {
+      allow create: if reservaValida(request.resource.data);
+      allow read, update, delete: if esAdmin();
+    }
+
+    // Disponibilidad: horarios ocupados sin datos personales.
+    // Se puede leer para armar el calendario y crear un horario nuevo al reservar.
+    // Liberar o modificar un horario: solo la administradora.
+    match /disponibilidad/{slotId} {
+      allow read: if true;
+      allow create: if horarioValido(slotId, request.resource.data);
+      allow update, delete: if esAdmin();
+    }
+
+    // Cualquier otra colección queda bloqueada (no hay regla = acceso denegado).
+  }
+}

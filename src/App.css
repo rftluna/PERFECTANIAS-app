@@ -490,23 +490,56 @@ main {
    PERFECTANIAS - DEGRADADO ROSA GLOBAL
 ========================================== */
 
-html,
+html {
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+}
+
 body {
     min-height: 100%;
     margin: 0;
     padding: 0;
+    background: transparent;
+}
+
+/* El degradado vive en una capa fija detrás de toda la página:
+   se ve igual en celular, tablet y PC, con cualquier zoom y largo de página
+   (background-attachment: fixed no funciona bien en iPhone, esto sí). */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
     background: linear-gradient(
         180deg,
         #ffffff 0%,
-        #fdf7fa 45%,
-        #f9e6ee 85%,
-        #f5dbe6 100%
-    ) no-repeat fixed;
-    background-size: cover;
+        #ffffff 18%,
+        #fdf1f5 38%,
+        #f8d9e4 70%,
+        #f2bfd0 100%
+    );
 }
 
 /* Asegura que los contenedores principales no tapen el degradado con un blanco sólido */
 .reserva-dashboard,
-.catalogo-servicios {
+.catalogo-servicios,
+.app-contenedor {
     background-color: transparent !important;
+}
+/* ---------------- ALERTAS (react-toastify) EN ROSA PERFECTANIAS ---------------- */
+:root {
+    --toastify-color-success: #c47d9d;   /* rosa principal oscurecido para que el texto blanco se lea */
+    --toastify-color-info: #b48aa0;      /* malva suave */
+    --toastify-color-warning: #e0a46b;   /* durazno */
+    --toastify-color-error: #d0607a;     /* rosa frambuesa: sigue leyéndose como error */
+    --toastify-font-family: inherit;
+}
+
+.Toastify__toast {
+    border-radius: 14px;
+    box-shadow: 0 8px 22px rgba(196, 125, 157, 0.3);
+    font-weight: 600;
 }
