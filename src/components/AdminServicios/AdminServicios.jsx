@@ -176,7 +176,9 @@ export const AdminServicios = () => {
         <div className="container py-4">
             <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 pb-3 mb-4 border-bottom">
                 <div>
-                    <h4 className="fw-bold m-0">Gestión de Servicios — Perfectanias</h4>
+                    <h4 className="fw-bold m-0" style={{ color: "#e358ed" }}>
+                        Gestión de Servicios — Perfectanias
+                    </h4>
                     <small className="text-muted">Sesión: {usuario.email}</small>
                 </div>
                 <button type="button" onClick={handleLogout} className="btn btn-outline-secondary btn-sm rounded-pill px-3">

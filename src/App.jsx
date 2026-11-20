@@ -12,6 +12,10 @@ import { Footer } from "./components/Footer/Footer";
 import { ReservaDashboard } from "./components/ReservaDashboard/ReservaDashboard";
 import { AdminServicios } from "./components/AdminServicios/AdminServicios";
 
+// 3. IMPORTACIONES DE AUTENTICACIÓN
+import { Login } from "./components/Login/Login";
+import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
+
 function App() {
     return (
         <TurnoProvider>
@@ -25,11 +29,23 @@ function App() {
                 {/* ENRUTADOR PRINCIPAL DENTRO DEL CUERPO DE LA APP */}
                 <main className="flex-grow-1">
                     <Routes>
-                        {/* Todas las rutas principales cargan tu panel de control de turnos */}
+                        {/* RUTAS PÚBLICAS */}
                         <Route path="/" element={<ReservaDashboard />} />
                         <Route path="/category/:category" element={<ReservaDashboard />} />
                         <Route path="/turnos" element={<ReservaDashboard />} />
-                        <Route path="/admin" element={<AdminServicios />} />
+
+                        {/* LOGIN ADMINISTRATIVO */}
+                        <Route path="/admin/login" element={<Login />} />
+
+                        {/* PANEL ADMINISTRATIVO PROTEGIDO */}
+                        <Route
+                            path="/admin"
+                            element={
+                                <ProtectedRoute>
+                                    <AdminServicios />
+                                </ProtectedRoute>
+                            }
+                        />
                     </Routes>
                 </main>
 
