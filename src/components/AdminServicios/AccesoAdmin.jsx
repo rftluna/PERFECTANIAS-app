@@ -2,6 +2,7 @@ import { useState } from "react";
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword, verifyBeforeUpdateEmail } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { toast } from "react-toastify";
+import { evaluarPassword, passwordEsSegura } from "../../utils/seguridadPassword";
 
 const ROSA = "#d4a3b8";
 
@@ -15,7 +16,7 @@ const mensajeError = (error) => {
         case "auth/too-many-requests":
             return "Demasiados intentos. Esperá unos minutos y probá de nuevo.";
         case "auth/weak-password":
-            return "La contraseña nueva es muy débil: usá al menos 6 caracteres.";
+            return "La contraseña nueva es muy débil: usá letras, números y un símbolo.";
         case "auth/email-already-in-use":
             return "Ese correo ya está usado por otra cuenta.";
         case "auth/invalid-email":
@@ -48,8 +49,8 @@ export const AccesoAdmin = () => {
     const handleCambiarPassword = async (e) => {
         e.preventDefault();
 
-        if (pass.nueva.length < 6) {
-            toast.warning("La contraseña nueva tiene que tener al menos 6 caracteres.");
+        if (!passwordEsSegura(pass.nueva)) {
+            toast.warning("La contraseña nueva no cumple todos los requisitos de seguridad.");
             return;
         }
         if (pass.nueva !== pass.repetir) {
@@ -106,7 +107,7 @@ export const AccesoAdmin = () => {
             <div className="col-lg-6">
                 <div className="card p-4 shadow-sm border rounded-4 bg-white h-100">
                     <h5 className="fw-bold mb-1">🔐 Cambiar contraseña</h5>
-                    <p className="text-muted small mb-4">Elegí una contraseña que solo sepas vos. Mínimo 6 caracteres.</p>
+                    <p className="text-muted small mb-4">Elegí una contraseña que solo sepas vos, alfanumérica y con al menos un símbolo.</p>
 
                     <form onSubmit={handleCambiarPassword} className="d-flex flex-column gap-3">
                         <div>
@@ -115,13 +116,23 @@ export const AccesoAdmin = () => {
                         </div>
                         <div>
                             <label className="form-label small fw-semibold">Contraseña nueva</label>
-                            <input type="password" className="form-control" autoComplete="new-password" minLength={6} value={pass.nueva} onChange={(e) => setPass((p) => ({ ...p, nueva: e.target.value }))} required />
+                            <input type="password" className="form-control" autoComplete="new-password" minLength={8} value={pass.nueva} onChange={(e) => setPass((p) => ({ ...p, nueva: e.target.value }))} required />
+
+                            {/* Checklist en vivo de requisitos */}
+                            <ul className="list-unstyled small mt-2 mb-0">
+                                {evaluarPassword(pass.nueva).map((req) => (
+                                    <li key={req.id} style={{ color: req.ok ? "#2e9d6a" : "#a2627f" }}>
+                                        {req.ok ? "✓" : "○"} {req.texto}
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
                         <div>
                             <label className="form-label small fw-semibold">Repetí la contraseña nueva</label>
-                            <input type="password" className="form-control" autoComplete="new-password" minLength={6} value={pass.repetir} onChange={(e) => setPass((p) => ({ ...p, repetir: e.target.value }))} required />
+                            <input type="password" className="form-control" autoComplete="new-password" minLength={8} value={pass.repetir} onChange={(e) => setPass((p) => ({ ...p, repetir: e.target.value }))} required />
+                            {pass.repetir && pass.repetir !== pass.nueva && <small style={{ color: "#b04a68" }}>Las contraseñas no coinciden.</small>}
                         </div>
-                        <button type="submit" disabled={guardandoPass} className="btn rounded-pill fw-bold px-4 border-0 align-self-start" style={{ backgroundColor: ROSA, color: "#ffffff" }}>
+                        <button type="submit" disabled={guardandoPass || !passwordEsSegura(pass.nueva) || pass.nueva !== pass.repetir} className="btn rounded-pill fw-bold px-4 border-0 align-self-start" style={{ backgroundColor: ROSA, color: "#ffffff" }}>
                             {guardandoPass ? "Cambiando..." : "Cambiar contraseña"}
                         </button>
                     </form>

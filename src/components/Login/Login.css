@@ -97,3 +97,81 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+
+/* ---------------- EXTRAS DE SEGURIDAD ---------------- */
+
+.login-form .login-icono {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  border-radius: 50%;
+  background-color: #fff0f5;
+  border: 1px solid #f1e3e9;
+}
+
+.login-form .login-aviso {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 1.2rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  background-color: #fff7fa;
+  border: 1px solid #ead1dc;
+  color: #a2627f;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.login-form .login-aviso-bloqueo {
+  background-color: #fdecef;
+  border-color: #f2b8c6;
+  color: #b04a68;
+}
+
+.login-form .login-aviso-bloqueo b {
+  font-variant-numeric: tabular-nums;
+}
+
+.login-form input:disabled {
+  background-color: #faf6f8;
+  cursor: not-allowed;
+}
+
+.login-form .login-link-olvido {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #c47d9d;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.login-form .login-link-olvido:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.login-form .login-link-olvido:disabled {
+  color: #b5a5ad;
+  cursor: not-allowed;
+}
+
+.login-form .login-pasos {
+  margin: 0 0 1.25rem;
+  padding: 0.9rem 1rem 0.9rem 2rem;
+  border-radius: 12px;
+  background-color: #fff7fa;
+  border: 1px dashed #ead1dc;
+  color: #5a5458;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
