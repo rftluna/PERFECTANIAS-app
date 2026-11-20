@@ -65,7 +65,7 @@ export const CatalogoServicios = () => {
     const serviciosFiltrados = servicios.filter((srv) => {
         const categoriaSrv = normalizarCategoria(srv.category);
         // En "Todos" se muestran todos los servicios cargados (aunque tengan otra categoría).
-        const coincideCategoria = !esSeccionPestanas || filtroCategoria === "todos" ? true : categoriaSrv === normalizarCategoria(filtroCategoria);
+        const coincideCategoria = filtroCategoria === "todos" ? true : categoriaSrv === normalizarCategoria(filtroCategoria);
 
         const termino = busqueda.trim().toLowerCase();
         const coincideBusqueda = !termino || (srv.name && srv.name.toLowerCase().includes(termino)) || (srv.description && srv.description.toLowerCase().includes(termino));
@@ -73,9 +73,9 @@ export const CatalogoServicios = () => {
         return coincideCategoria && coincideBusqueda;
     });
 
-    // Orden elegido por la clienta (solo en la sección Pestañas).
+    // Orden elegido por la clienta (en Inicio y en Pestañas).
     const compararNombre = (a, b) => String(a.name || "").localeCompare(String(b.name || ""), "es", { sensitivity: "base" });
-    const serviciosOrdenados = !esSeccionPestanas || orden === "recomendados"
+    const serviciosOrdenados = orden === "recomendados"
         ? serviciosFiltrados
         : [...serviciosFiltrados].sort((a, b) => {
               if (orden === "precio-asc") return Number(a.price || 0) - Number(b.price || 0) || compararNombre(a, b);
@@ -109,8 +109,8 @@ export const CatalogoServicios = () => {
                 </div>
             </div>
 
-            {/* FILTROS Y ORDEN (solo en Pestañas) */}
-            {esSeccionPestanas && (
+            {/* FILTROS Y ORDEN (siempre visibles) */}
+            {(
                 <div className="filtros-y-orden">
                 <div className="filtros-servicios">
                     <button type="button" className={`filtro-servicio ${filtroCategoria === "todos" ? "activo" : ""}`} onClick={() => setFiltroCategoria("todos")}>
