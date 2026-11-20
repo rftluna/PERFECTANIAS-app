@@ -6,6 +6,7 @@ import { db } from "../../firebase/config";
 import { toast } from "react-toastify";
 import { ReservasAdmin } from "./ReservasAdmin";
 import { ResenasAdmin } from "./ResenasAdmin";
+import { AccesoAdmin } from "./AccesoAdmin";
 
 const formInicial = {
     name: "",
@@ -138,11 +139,12 @@ export const AdminServicios = () => {
             </div>
 
             {/* PESTAÑAS DEL PANEL */}
-            <div className="d-flex gap-2 mb-4">
+            <div className="d-flex flex-wrap gap-2 mb-4">
                 {[
                     { id: "reservas", texto: "📅 Reservas" },
                     { id: "servicios", texto: "💅 Servicios" },
-                    { id: "resenas", texto: "⭐ Reseñas" }
+                    { id: "resenas", texto: "⭐ Reseñas" },
+                    { id: "acceso", texto: "🔐 Acceso" }
                 ].map((tab) => (
                     <button
                         key={tab.id}
@@ -164,6 +166,8 @@ export const AdminServicios = () => {
                 <ReservasAdmin />
             ) : seccion === "resenas" ? (
                 <ResenasAdmin />
+            ) : seccion === "acceso" ? (
+                <AccesoAdmin />
             ) : (
             <div className="row g-4">
                 <div className="col-lg-5">
