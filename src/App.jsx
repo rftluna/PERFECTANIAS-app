@@ -10,6 +10,7 @@ import { TurnoProvider } from "./context/TurnoContext";
 import { Nav } from "./components/Nav/Nav";
 import { Footer } from "./components/Footer/Footer";
 import { ReservaDashboard } from "./components/ReservaDashboard/ReservaDashboard";
+import { AdminServicios } from "./components/AdminServicios/AdminServicios";
 
 function App() {
     return (
@@ -28,6 +29,7 @@ function App() {
                         <Route path="/" element={<ReservaDashboard />} />
                         <Route path="/category/:category" element={<ReservaDashboard />} />
                         <Route path="/turnos" element={<ReservaDashboard />} />
+                        <Route path="/admin" element={<AdminServicios />} />
                     </Routes>
                 </main>
 

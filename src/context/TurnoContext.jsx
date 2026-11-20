@@ -2,6 +2,7 @@ import { createContext, useContext, useState } from "react";
 import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { toast } from "react-toastify";
+import emailjs from "@emailjs/browser";
 
 const TurnoContext = createContext();
 
@@ -167,6 +168,10 @@ export const TurnoProvider = ({ children }) => {
                           cantidad: Number(s.cantidad || 1)
                       }));
 
+            const totalCalculado = getTotal();
+            const senaCalculada = Math.round(totalCalculado * 0.5);
+            const formatearMonto = (num) => Number(num || 0).toLocaleString("es-AR");
+
             const nuevoTurno = {
                 sucursalId: sucursal.id,
                 sucursalNombre: sucursal.nombre,
@@ -174,14 +179,54 @@ export const TurnoProvider = ({ children }) => {
                 asignacionesPorHora,
                 fecha: fechaSeleccionada,
                 hora: horaSeleccionada,
-                formaPago,
+                formaPago: "Transferencia bancaria",
                 cliente: datosCliente,
-                total: getTotal(),
+                total: totalCalculado,
+                sena: senaCalculada,
                 createdAt: new Date().toISOString()
             };
 
             if (db) {
                 await addDoc(collection(db, "reservas"), nuevoTurno);
+            }
+
+            // Envío de confirmación por email con EmailJS
+            const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+            const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+            const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+            const resumenServiciosTexto = serviciosOrdenadosPorHora
+                .map((item) => {
+                    const cant = item.cantidad ? ` (x${item.cantidad})` : "";
+                    const horarioItem = item.hora ? ` - ${item.hora} hs` : "";
+                    return `• ${item.name}${cant}${horarioItem} ($${formatearMonto(item.price)})`;
+                })
+                .join("\n");
+
+            if (datosCliente?.email && serviceId && templateId && publicKey) {
+                try {
+                    await emailjs.send(
+                        serviceId,
+                        templateId,
+                        {
+                            to_email: datosCliente.email,
+                            cliente_nombre: `${datosCliente.nombre || ""} ${datosCliente.apellido || ""}`.trim(),
+                            sucursal_nombre: sucursal?.nombre || "",
+                            fecha: fechaSeleccionada,
+                            hora: horaSeleccionada,
+                            servicios_detalle: resumenServiciosTexto,
+                            total: `$${formatearMonto(totalCalculado)}`,
+                            sena: `$${formatearMonto(senaCalculada)}`,
+                            forma_pago: "Transferencia bancaria (50% de seña)"
+                        },
+                        {
+                            publicKey
+                        }
+                    );
+                } catch (emailError) {
+                    console.warn("Turno guardado, pero falló el envío del correo:", emailError);
+                    toast.info("Turno reservado, aunque no pudimos enviar el correo automático.");
+                }
             }
 
             toast.success("🎉 ¡Tu turno ha sido reservado con éxito!");
