@@ -5,13 +5,33 @@ service cloud.firestore {
 
     // ---------- FUNCIONES AUXILIARES ----------
 
-    // Cuentas administradoras (por UID: siguen valiendo aunque cambien email o clave).
-    // Tiene que coincidir con la lista ADMIN_UIDS de src/config/admins.js.
-    function esAdmin() {
+    // Dueña: siempre administradora (por UID: sigue valiendo aunque cambie email o clave).
+    // Tiene que coincidir con DUENA_UID de src/config/admins.js.
+    function esDuena() {
       return request.auth != null
-        && request.auth.uid in [
-          'OgWsAMKDYgQN8AhgDwjSvIzfjq72' // Dueña
-        ];
+        && request.auth.uid == 'OgWsAMKDYgQN8AhgDwjSvIzfjq72';
+    }
+
+    // Administradoras: la dueña o quien tenga su documento en /admins (se suman por invitación).
+    function esAdmin() {
+      return esDuena()
+        || (request.auth != null
+            && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    // Correo de la sesión, en minúsculas.
+    function emailSesion() {
+      return request.auth.token.email.lower();
+    }
+
+    // La invitación existe, es para el correo de la sesión, no venció
+    // y se borra en la misma operación (cada link sirve una sola vez).
+    function invitacionValida(codigo) {
+      let ruta = /databases/$(database)/documents/invitaciones/$(codigo);
+      return exists(ruta)
+        && get(ruta).data.email == emailSesion()
+        && get(ruta).data.expiraEn > request.time
+        && !existsAfter(ruta);
     }
 
     function textoValido(valor, maximo) {
@@ -110,6 +130,39 @@ service cloud.firestore {
         && request.resource.data.estrellas is number
         && request.resource.data.estrellas >= 1 && request.resource.data.estrellas <= 5
         && request.resource.data.texto is string && request.resource.data.texto.size() <= 1500;
+      allow delete: if esAdmin();
+    }
+
+    // Invitaciones para sumar administradoras (/admin → Equipo).
+    // El ID es un código secreto de 32 caracteres que va en el link: quien tiene el link puede leerla.
+    match /invitaciones/{codigo} {
+      allow get: if codigo.matches('^[0-9a-f]{32}$');
+      allow list: if esAdmin();
+      allow create: if esAdmin()
+        && codigo.matches('^[0-9a-f]{32}$')
+        && request.resource.data.keys().hasOnly(['email', 'creadaPor', 'creadaEn', 'expiraEn'])
+        && textoValido(request.resource.data.email, 120)
+        && request.resource.data.email == request.resource.data.email.lower()
+        && request.resource.data.expiraEn is timestamp
+        && request.resource.data.expiraEn > request.time
+        && request.resource.data.expiraEn < request.time + duration.value(31, 'd');
+      // La borra una administradora (cancelar) o la persona invitada al usarla.
+      allow delete: if esAdmin()
+        || (request.auth != null && resource.data.email == emailSesion());
+    }
+
+    // Administradoras sumadas por invitación (el ID es su UID).
+    match /admins/{uid} {
+      allow get: if request.auth != null && (request.auth.uid == uid || esAdmin());
+      allow list: if esAdmin();
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email', 'nombre', 'invitacion', 'creadaEn'])
+        && request.resource.data.email == emailSesion()
+        && textoValido(request.resource.data.nombre, 60)
+        && request.resource.data.invitacion is string
+        && invitacionValida(request.resource.data.invitacion);
+      allow update: if false;
       allow delete: if esAdmin();
     }
 

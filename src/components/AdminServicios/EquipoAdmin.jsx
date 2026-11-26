@@ -97,7 +97,7 @@ export const EquipoAdmin = () => {
     };
 
     const linkWhatsapp = (link) =>
-        `https://wa.me/?text=${encodeURIComponent(`¡Hola! Te invito al panel de Perfectanias para que puedas cargar y editar servicios. Creá tu cuenta acá (vence en ${DIAS_VALIDEZ_INVITACION} días): ${link}`)}`;
+        `https://wa.me/?text=${encodeURIComponent(`¡Hola! Te invito al panel de Perfectanias para que puedas cargar y editar servicios. Creá tu cuenta acá (tenés ${DIAS_VALIDEZ_INVITACION} días para usarlo): ${link}`)}`;
 
     const cancelarInvitacion = async (codigo) => {
         if (!window.confirm("¿Cancelar esta invitación? El link deja de funcionar.")) return;

@@ -5,4 +5,4 @@
 export const DUENA_UID = "OgWsAMKDYgQN8AhgDwjSvIzfjq72";
 
 // Días que dura un link de invitación.
-export const DIAS_VALIDEZ_INVITACION = 7;
+export const DIAS_VALIDEZ_INVITACION = 30;

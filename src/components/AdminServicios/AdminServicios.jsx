@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { ReservasAdmin } from "./ReservasAdmin";
 import { ResenasAdmin } from "./ResenasAdmin";
 import { AccesoAdmin } from "./AccesoAdmin";
+import { EquipoAdmin } from "./EquipoAdmin";
 import { CATEGORIA_POR_DEFECTO, DURACION_POR_DEFECTO, ORDENES, SECCIONES, SECCION_POR_DEFECTO, categoriasDe, duracionDe, limpiarCategoria, normalizarCategoria, ordenarServicios, seccionDe } from "../../utils/servicios";
 
 const formInicial = {
@@ -171,6 +172,7 @@ export const AdminServicios = () => {
                     { id: "reservas", texto: "📅 Reservas" },
                     { id: "servicios", texto: "💅 Servicios" },
                     { id: "resenas", texto: "⭐ Reseñas" },
+                    { id: "equipo", texto: "👭 Equipo" },
                     { id: "acceso", texto: "🔐 Acceso" }
                 ].map((tab) => (
                     <button
@@ -193,6 +195,8 @@ export const AdminServicios = () => {
                 <ReservasAdmin />
             ) : seccion === "resenas" ? (
                 <ResenasAdmin />
+            ) : seccion === "equipo" ? (
+                <EquipoAdmin />
             ) : seccion === "acceso" ? (
                 <AccesoAdmin />
             ) : (

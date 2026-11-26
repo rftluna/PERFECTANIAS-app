@@ -20,6 +20,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
 // El panel y el login se descargan solo cuando alguien entra a /admin (las clientas no los bajan).
 const AdminServicios = lazy(() => import("./components/AdminServicios/AdminServicios").then((m) => ({ default: m.AdminServicios })));
 const Login = lazy(() => import("./components/Login/Login").then((m) => ({ default: m.Login })));
+const RegistroAdmin = lazy(() => import("./components/RegistroAdmin/RegistroAdmin").then((m) => ({ default: m.RegistroAdmin })));
 
 const CargandoPagina = () => <p className="text-center text-muted py-5">Cargando...</p>;
 
@@ -44,6 +45,9 @@ function App() {
 
                         {/* LOGIN ADMINISTRATIVO */}
                         <Route path="/admin/login" element={<Login />} />
+
+                        {/* ALTA DE ADMINISTRADORA CON LINK DE INVITACIÓN (/admin/registro?codigo=...) */}
+                        <Route path="/admin/registro" element={<RegistroAdmin />} />
 
                         {/* PANEL ADMINISTRATIVO PROTEGIDO */}
                         <Route
