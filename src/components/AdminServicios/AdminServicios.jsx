@@ -9,6 +9,7 @@ import { ReservasAdmin } from "./ReservasAdmin";
 import { ResenasAdmin } from "./ResenasAdmin";
 import { AccesoAdmin } from "./AccesoAdmin";
 import { EquipoAdmin } from "./EquipoAdmin";
+import { FotoServicio } from "../IlustracionServicio/IlustracionServicio";
 import { CATEGORIA_POR_DEFECTO, DURACION_POR_DEFECTO, ORDENES, SECCIONES, SECCION_POR_DEFECTO, categoriasDe, duracionDe, limpiarCategoria, normalizarCategoria, ordenarServicios, seccionDe } from "../../utils/servicios";
 
 const formInicial = {
@@ -340,21 +341,7 @@ export const AdminServicios = () => {
                                 {serviciosVisibles.map((srv) => (
                                     <div key={srv.id} className="d-flex justify-content-between align-items-center gap-3 p-3 border rounded-3">
                                         <div className="d-flex align-items-center gap-3">
-                                            {srv.image && (
-                                                <img
-                                                    src={srv.image}
-                                                    alt={srv.name}
-                                                    style={{
-                                                        width: "54px",
-                                                        height: "54px",
-                                                        objectFit: "cover",
-                                                        borderRadius: "8px"
-                                                    }}
-                                                    onError={(e) => {
-                                                        e.currentTarget.style.display = "none";
-                                                    }}
-                                                />
-                                            )}
+                                            <FotoServicio servicio={srv} className="admin-thumb-servicio" />
                                             <div>
                                                 <div className="fw-bold">{srv.name}</div>
                                                 <div className="small text-muted">

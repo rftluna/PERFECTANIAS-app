@@ -325,3 +325,162 @@
         opacity: 1;
     }
 }
+
+/* ==========================================
+   ESTILO ROSA DE LA APP + FORMULARIO DE CLIENTAS
+========================================== */
+.opiniones-btn-dejar {
+    background-color: #d4a3b8;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(212, 163, 184, 0.35);
+}
+
+.opiniones-btn-dejar:hover:not(:disabled) {
+    background-color: #c47d9d;
+}
+
+.opiniones-btn-dejar:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.opiniones-btn-dejar:focus-visible,
+.opiniones-link-ver:focus-visible,
+.resena-estrellas-elegir button:focus-visible {
+    outline: 2px solid #d4a3b8;
+    outline-offset: 2px;
+}
+
+.opinion-respuesta {
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    border-left: 3px solid #e8b4c8;
+    background: #fff7fa;
+    border-radius: 0 10px 10px 0;
+    font-size: 13px;
+    color: #5c4a53;
+}
+
+.opinion-origen {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 11px;
+    color: #a2627f;
+    background: #fff0f5;
+    border: 1px solid #f1e3e9;
+    border-radius: 999px;
+    padding: 2px 9px;
+}
+
+.resena-form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 20px;
+    border: 1px solid #f1e3e9;
+    border-radius: 16px;
+    background: #fff;
+}
+
+.resena-form h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #2c282c;
+    margin: 0 0 4px;
+}
+
+.resena-form label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b5862;
+    margin-top: 8px;
+}
+
+.resena-form input,
+.resena-form textarea {
+    border: 1px solid #ead1dc;
+    border-radius: 12px;
+    padding: 9px 12px;
+    font-size: 14px;
+    outline: none;
+    resize: vertical;
+}
+
+.resena-form input:focus,
+.resena-form textarea:focus {
+    border-color: #d4a3b8;
+    box-shadow: 0 0 0 3px rgba(212, 163, 184, 0.18);
+}
+
+.resena-estrellas-elegir {
+    display: flex;
+    gap: 4px;
+}
+
+.resena-estrellas-elegir button {
+    background: none;
+    border: none;
+    padding: 0 2px;
+    font-size: 30px;
+    line-height: 1;
+    color: #ead1dc;
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.resena-estrellas-elegir button.llena {
+    color: #d4a3b8;
+}
+
+.resena-estrellas-elegir button:hover {
+    transform: scale(1.1);
+}
+
+.resena-contador {
+    align-self: flex-end;
+    color: #a2949b;
+    font-size: 11px;
+}
+
+.resena-error {
+    color: #b04a68;
+    font-size: 13px;
+    margin: 4px 0 0;
+}
+
+.resena-acciones {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.resena-volver {
+    background: none;
+    border: none;
+    margin-top: 0;
+    cursor: pointer;
+}
+
+.resena-enviada {
+    text-align: center;
+    align-items: center;
+    padding: 32px 20px;
+}
+
+.resena-enviada-icono {
+    font-size: 40px;
+}
+
+.resena-enviada p {
+    color: #7a6a72;
+    font-size: 14px;
+}
+
+@media (max-width: 767px) {
+    .resena-acciones .opiniones-btn-dejar {
+        width: 100%;
+    }
+}

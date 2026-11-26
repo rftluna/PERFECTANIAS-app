@@ -4,6 +4,7 @@ import { useTurno } from "../../context/TurnoContext";
 import { Container, Row, Col } from "react-bootstrap";
 import { FaCheckCircle, FaChevronRight, FaSearch } from "react-icons/fa";
 import { ORDENES, calcularSena, categoriasDe, duracionDe, formatearMoneda, limpiarCategoria, normalizarCategoria, ordenarServicios, seccionDe } from "../../utils/servicios";
+import { FotoServicio } from "../IlustracionServicio/IlustracionServicio";
 import "./CatalogoServicios.css";
 
 // Tarjetas grises mientras carga el catálogo.
@@ -177,18 +178,8 @@ export const CatalogoServicios = ({ seccion = null, titulo = "Elegí servicios" 
                                         </span>
                                     )}
 
-                                    {/* FOTO CUADRADA DE IMGBB */}
-                                    {srv.image && (
-                                        <div className="servicio-thumb-cuadrada">
-                                            <img
-                                                src={srv.image}
-                                                alt={srv.name || "Servicio"}
-                                                onError={(e) => {
-                                                    e.currentTarget.parentElement.style.display = "none";
-                                                }}
-                                            />
-                                        </div>
-                                    )}
+                                    {/* FOTO CUADRADA (o ilustración si todavía no tiene foto) */}
+                                    <FotoServicio servicio={srv} className="servicio-thumb-cuadrada" />
 
                                     {/* DATOS DEL SERVICIO */}
                                     <div className="servicio-info-central">

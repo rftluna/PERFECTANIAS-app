@@ -133,6 +133,20 @@ service cloud.firestore {
       allow delete: if esAdmin();
     }
 
+    // Opiniones que dejan las clientas desde la web: quedan pendientes hasta que una administradora
+    // las aprueba en /admin → Reseñas (ahí se copian a /resenas). Nadie más las puede leer.
+    match /resenasPendientes/{resenaId} {
+      allow create: if request.resource.data.keys().hasOnly(['nombre', 'fecha', 'estrellas', 'texto', 'creadaEn'])
+        && request.resource.data.keys().hasAll(['nombre', 'fecha', 'estrellas', 'texto', 'creadaEn'])
+        && textoValido(request.resource.data.nombre, 60)
+        && fechaValida(request.resource.data.fecha)
+        && request.resource.data.estrellas is int
+        && request.resource.data.estrellas >= 1 && request.resource.data.estrellas <= 5
+        && textoValido(request.resource.data.texto, 1000)
+        && request.resource.data.creadaEn == request.time;
+      allow read, delete: if esAdmin();
+    }
+
     // Invitaciones para sumar administradoras (/admin → Equipo).
     // El ID es un código secreto de 32 caracteres que va en el link: quien tiene el link puede leerla.
     match /invitaciones/{codigo} {

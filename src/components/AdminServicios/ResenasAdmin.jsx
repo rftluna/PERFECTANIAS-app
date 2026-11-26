@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc, writeBatch } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { toast } from "react-toastify";
 import { Estrellas } from "../ResenasGoogle/ResenasGoogle";
-import { LINKS_POR_DEFECTO, LINK_MAPS_PERFECTANIAS, calcularPromedio, formatearFechaResena, formatearPuntaje } from "../ResenasGoogle/resenasUtils";
+import { LINKS_POR_DEFECTO, LINK_MAPS_PERFECTANIAS, LINK_OPINIONES_AGENDAMAS, calcularPromedio, cargarResenasAgendamas, formatearFechaResena, formatearPuntaje, unirResenas } from "../ResenasGoogle/resenasUtils";
 
 const ROSA = "#d4a3b8";
 
@@ -16,6 +16,9 @@ const formVacio = () => ({ nombre: "", fecha: obtenerHoy(), estrellas: "5", text
 
 export const ResenasAdmin = () => {
     const [resenas, setResenas] = useState([]);
+    const [pendientes, setPendientes] = useState([]);
+    const [deAgendamas, setDeAgendamas] = useState([]);
+    const [procesandoId, setProcesandoId] = useState(null);
     const [form, setForm] = useState(formVacio());
     const [editandoId, setEditandoId] = useState(null);
     const [links, setLinks] = useState(LINKS_POR_DEFECTO);
@@ -25,7 +28,14 @@ export const ResenasAdmin = () => {
 
     const cargar = async () => {
         try {
-            const [snapResenas, snapConfig] = await Promise.all([getDocs(collection(db, "resenas")), getDoc(doc(db, "config", "resenas"))]);
+            const [snapResenas, snapConfig, snapPendientes, externas] = await Promise.all([
+                getDocs(collection(db, "resenas")),
+                getDoc(doc(db, "config", "resenas")),
+                getDocs(collection(db, "resenasPendientes")).catch(() => null),
+                cargarResenasAgendamas()
+            ]);
+            setDeAgendamas(externas);
+            setPendientes(snapPendientes ? snapPendientes.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => String(b.fecha || "").localeCompare(String(a.fecha || ""))) : []);
             setResenas(snapResenas.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => String(b.fecha || "").localeCompare(String(a.fecha || ""))));
             if (snapConfig.exists()) {
                 const d = snapConfig.data();
@@ -104,6 +114,42 @@ export const ResenasAdmin = () => {
         }
     };
 
+    // Aprobar: pasa a "resenas" (se publica) y se borra de pendientes, todo junto.
+    const aprobar = async (p) => {
+        setProcesandoId(p.id);
+        try {
+            const batch = writeBatch(db);
+            batch.set(doc(collection(db, "resenas")), {
+                nombre: p.nombre,
+                fecha: p.fecha || obtenerHoy(),
+                estrellas: Math.max(1, Math.min(5, Number(p.estrellas) || 5)),
+                texto: p.texto || ""
+            });
+            batch.delete(doc(db, "resenasPendientes", p.id));
+            await batch.commit();
+            toast.success(`Opinión de ${p.nombre} publicada.`);
+            await cargar();
+        } catch (err) {
+            toast.error("No se pudo aprobar: " + err.message);
+        } finally {
+            setProcesandoId(null);
+        }
+    };
+
+    const rechazar = async (p) => {
+        if (!window.confirm(`¿Descartar la opinión de ${p.nombre}? No se va a publicar.`)) return;
+        setProcesandoId(p.id);
+        try {
+            await deleteDoc(doc(db, "resenasPendientes", p.id));
+            setPendientes((prev) => prev.filter((x) => x.id !== p.id));
+            toast.info("Opinión descartada.");
+        } catch (err) {
+            toast.error("No se pudo descartar: " + err.message);
+        } finally {
+            setProcesandoId(null);
+        }
+    };
+
     const handleGuardarLinks = async (e) => {
         e.preventDefault();
         setGuardandoLinks(true);
@@ -122,15 +168,53 @@ export const ResenasAdmin = () => {
 
     if (cargando) return <p className="text-muted small">Cargando reseñas...</p>;
 
-    const promedio = calcularPromedio(resenas);
+    // Lo que ve la clienta: propias + Agendamas sin repetir.
+    const publicadas = unirResenas(resenas, deAgendamas);
+    const promedio = calcularPromedio(publicadas);
+    const idsVisibles = new Set(publicadas.map((r) => r.id));
+    const agendamasVisibles = deAgendamas.filter((r) => idsVisibles.has(r.id));
 
     return (
         <div className="row g-4">
+            {/* PENDIENTES DE APROBAR */}
+            {pendientes.length > 0 && (
+                <div className="col-12">
+                    <div className="card p-4 shadow-sm rounded-4 bg-white" style={{ border: `2px solid ${ROSA}` }}>
+                        <h5 className="fw-bold mb-1">💌 Opiniones nuevas para revisar ({pendientes.length})</h5>
+                        <p className="text-muted small mb-3">Las dejaron clientas desde la web. Aprobalas para publicarlas o descartalas.</p>
+                        <div className="d-flex flex-column gap-3">
+                            {pendientes.map((p) => (
+                                <div key={p.id} className="p-3 border rounded-3">
+                                    <div className="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+                                        <div>
+                                            <div className="fw-bold">{p.nombre}</div>
+                                            <div className="d-flex align-items-center gap-2 small text-muted">
+                                                <Estrellas puntaje={p.estrellas} tamano={12} />
+                                                {formatearFechaResena(p.fecha)}
+                                            </div>
+                                        </div>
+                                        <div className="d-flex gap-2">
+                                            <button type="button" disabled={procesandoId === p.id} onClick={() => aprobar(p)} className="btn btn-sm rounded-pill px-3 fw-semibold border-0" style={{ backgroundColor: ROSA, color: "#ffffff" }}>
+                                                Aprobar
+                                            </button>
+                                            <button type="button" disabled={procesandoId === p.id} onClick={() => rechazar(p)} className="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                                                Descartar
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {p.texto && <p className="small mb-0 mt-2" style={{ whiteSpace: "pre-line" }}>{p.texto}</p>}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* FORMULARIO */}
             <div className="col-lg-5">
                 <div className="card p-4 shadow-sm border rounded-4 bg-white mb-4">
                     <h5 className="fw-bold mb-1">{editandoId ? "Editar opinión" : "Agregar opinión"}</h5>
-                    <p className="text-muted small mb-3">Copiá la reseña tal cual aparece en Google Maps.</p>
+                    <p className="text-muted small mb-3">Para sumar a mano una reseña de Google Maps u otro lugar. Las de Agendamas se suman solas.</p>
 
                     <form onSubmit={handleGuardarResena} className="d-flex flex-column gap-3">
                         <div>
@@ -175,18 +259,11 @@ export const ResenasAdmin = () => {
 
                 {/* LINKS */}
                 <div className="card p-4 shadow-sm border rounded-4 bg-white">
-                    <h6 className="fw-bold mb-3">Links de Google</h6>
+                    <h6 className="fw-bold mb-3">Link de Google Maps</h6>
                     <form onSubmit={handleGuardarLinks} className="d-flex flex-column gap-3">
                         <div>
                             <label className="form-label small fw-semibold">Ver todas las reseñas</label>
                             <input type="url" className="form-control" value={links.linkVer} onChange={(e) => setLinks((p) => ({ ...p, linkVer: e.target.value }))} />
-                        </div>
-                        <div>
-                            <label className="form-label small fw-semibold">Botón “Dejar reseña”</label>
-                            <input type="url" className="form-control" placeholder="https://g.page/r/.../review" value={links.linkDejar} onChange={(e) => setLinks((p) => ({ ...p, linkDejar: e.target.value }))} />
-                            <small className="text-muted">
-                                En tu Perfil de Empresa de Google → <strong>Pedir reseñas</strong> → copiá el link y pegalo acá.
-                            </small>
                         </div>
                         <button type="submit" disabled={guardandoLinks} className="btn btn-outline-secondary rounded-pill px-4 align-self-start">
                             {guardandoLinks ? "Guardando..." : "Guardar links"}
@@ -199,8 +276,8 @@ export const ResenasAdmin = () => {
             <div className="col-lg-7">
                 <div className="card p-4 shadow-sm border rounded-4 bg-white">
                     <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-                        <h5 className="fw-bold m-0">Opiniones en la web ({resenas.length})</h5>
-                        {resenas.length > 0 && (
+                        <h5 className="fw-bold m-0">Opiniones en la web ({publicadas.length})</h5>
+                        {publicadas.length > 0 && (
                             <span className="d-flex align-items-center gap-2 small">
                                 <Estrellas puntaje={promedio} />
                                 <strong>{formatearPuntaje(promedio)}</strong>
@@ -209,8 +286,29 @@ export const ResenasAdmin = () => {
                         )}
                     </div>
 
+                    {/* DE AGENDAMAS (solo lectura) */}
+                    <div className="p-3 rounded-3 mb-3 small" style={{ backgroundColor: "#fff7fa", border: "1px solid #f1e3e9" }}>
+                        <div className="fw-semibold mb-1">🔄 De Agendamas: {agendamasVisibles.length} {agendamasVisibles.length === 1 ? "opinión" : "opiniones"}</div>
+                        <div className="text-muted">
+                            Se leen automáticamente de{" "}
+                            <a href={LINK_OPINIONES_AGENDAMAS} target="_blank" rel="noreferrer" style={{ color: "#bd829d" }}>
+                                tu página de Agendamas
+                            </a>{" "}
+                            (se actualizan cada hora). Para editarlas o borrarlas, hacelo en Agendamas.
+                            {deAgendamas.length > agendamasVisibles.length && ` ${deAgendamas.length - agendamasVisibles.length} no se muestran porque ya las cargaste a mano abajo.`}
+                        </div>
+                        {agendamasVisibles.map((r) => (
+                            <div key={r.id} className="d-flex align-items-center gap-2 mt-2">
+                                <Estrellas puntaje={r.estrellas} tamano={11} />
+                                <strong>{r.nombre}</strong>
+                                <span className="text-muted">· {formatearFechaResena(r.fecha)}</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    <h6 className="fw-bold small text-uppercase text-muted">Cargadas en esta web ({resenas.length})</h6>
                     {resenas.length === 0 ? (
-                        <p className="text-muted small m-0">Todavía no cargaste opiniones. Agregá las que ya tenés en Google Maps.</p>
+                        <p className="text-muted small m-0">Todavía no hay opiniones cargadas acá.</p>
                     ) : (
                         <div className="d-flex flex-column gap-3">
                             {resenas.map((r) => (

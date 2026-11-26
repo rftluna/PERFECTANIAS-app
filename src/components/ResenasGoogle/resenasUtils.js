@@ -25,3 +25,42 @@ export const formatearFechaResena = (fecha) => {
     if (!a || !m || !d) return String(fecha);
     return new Date(a, m - 1, d).toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" }).replace(/\./g, "").replace(/ de /g, " ");
 };
+
+// Opiniones que las clientas dejaron en Agendamas (las lee la función /api/resenas-agendamas en Vercel).
+export const API_RESENAS_AGENDAMAS = "/api/resenas-agendamas";
+export const LINK_OPINIONES_AGENDAMAS = "https://www.agendamas.app/perfectanias?opiniones=1";
+
+export const cargarResenasAgendamas = async () => {
+    try {
+        const respuesta = await fetch(API_RESENAS_AGENDAMAS);
+        if (!respuesta.ok) return [];
+        const datos = await respuesta.json();
+        return Array.isArray(datos.resenas) ? datos.resenas : [];
+    } catch {
+        // En desarrollo local (sin Vercel) o si Agendamas no responde: solo se ven las reseñas propias.
+        return [];
+    }
+};
+
+const normalizar = (texto) =>
+    String(texto || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[^a-z0-9]/g, "");
+
+// Une las reseñas de la web con las de Agendamas sin repetir las que se cargaron a mano en los dos lados
+// (misma clienta y mismo comienzo del texto, o misma clienta y misma fecha). Más nuevas primero.
+export const unirResenas = (propias, externas) => {
+    const claves = new Set();
+    const resultado = [];
+    [...propias, ...externas].forEach((r) => {
+        const nombre = normalizar(r.nombre);
+        const porTexto = `${nombre}|${normalizar(r.texto).slice(0, 24)}`;
+        const porFecha = `${nombre}|${r.fecha}`;
+        if (claves.has(porTexto) || claves.has(porFecha)) return;
+        claves.add(porTexto);
+        claves.add(porFecha);
+        resultado.push(r);
+    });
+    return resultado.sort((a, b) => String(b.fecha || "").localeCompare(String(a.fecha || "")));
+};
