@@ -11,6 +11,8 @@ import { Nav } from "./components/Nav/Nav";
 import { Footer } from "./components/Footer/Footer";
 import { ReservaDashboard } from "./components/ReservaDashboard/ReservaDashboard";
 import { AdminServicios } from "./components/AdminServicios/AdminServicios";
+import { NotFound } from "./components/NotFound/NotFound";
+import { UbicacionMapa } from "./components/UbicacionMapa/UbicacionMapa";
 
 // 3. IMPORTACIONES DE AUTENTICACIÓN
 import { Login } from "./components/Login/Login";
@@ -46,8 +48,14 @@ function App() {
                                 </ProtectedRoute>
                             }
                         />
+
+                        {/* PÁGINA 404 PARA CUALQUIER RUTA INEXISTENTE */}
+                        <Route path="*" element={<NotFound />} />
                     </Routes>
                 </main>
+
+                {/* MAPA DE UBICACIÓN DE LAS SUCURSALES, ARRIBA DEL FOOTER */}
+                <UbicacionMapa />
 
                 {/* PIE DE PÁGINA PERMANENTE CON ICONOS DE INSTAGRAM Y WHATSAPP */}
                 <Footer />
