@@ -2,9 +2,10 @@ import { useEffect } from "react";
 import { useTurno } from "../../context/TurnoContext";
 import { Container, Form, Card, Button } from "react-bootstrap";
 import { FaUniversity } from "react-icons/fa";
+import { SENA_TEXTO, formatearMoneda } from "../../utils/servicios";
 
 export const FormaPago = () => {
-    const { formaPago, setFormaPago, setPaso, getTotal } = useTurno();
+    const { formaPago, setFormaPago, setPaso, getTotal, getSena } = useTurno();
 
     useEffect(() => {
         if (formaPago !== "Transferencia bancaria") {
@@ -13,8 +14,7 @@ export const FormaPago = () => {
     }, [formaPago, setFormaPago]);
 
     const totalReserva = getTotal();
-    const senaCincuentaPorCiento = Math.round(totalReserva * 0.5);
-    const formatearMoneda = (valor) => Number(valor || 0).toLocaleString("es-AR");
+    const senaReserva = getSena();
 
     return (
         <Container fluid className="p-0">
@@ -23,7 +23,7 @@ export const FormaPago = () => {
             </h4>
 
             <div className="d-flex flex-column gap-3 mb-4">
-                {/* ÚNICA OPCIÓN: TRANSFERENCIA BANCARIA (SEÑA 50%) */}
+                {/* ÚNICA OPCIÓN: TRANSFERENCIA BANCARIA (SEÑA) */}
                 <Card className="p-3 border rounded-3 shadow-sm bg-light" onClick={() => setFormaPago("Transferencia bancaria")} style={{ cursor: "pointer", borderColor: "#d4a3b8" }}>
                     <div className="d-flex align-items-start gap-3">
                         <Form.Check type="radio" name="pago" checked={true} onChange={() => setFormaPago("Transferencia bancaria")} className="mt-1" />
@@ -32,7 +32,7 @@ export const FormaPago = () => {
                                 <FaUniversity style={{ color: "#d4a3b8" }} /> Transferencia bancaria
                             </strong>
                             <p className="text-muted small m-0 mt-1">
-                                Se requiere abonar el <strong>50% por transferencia para reservar el turno</strong> (<strong>${formatearMoneda(senaCincuentaPorCiento)}</strong> sobre un total de $
+                                Se requiere abonar el <strong>{SENA_TEXTO} por transferencia para reservar el turno</strong> (<strong>${formatearMoneda(senaReserva)}</strong> sobre un total de $
                                 {formatearMoneda(totalReserva)}).
                             </p>
 

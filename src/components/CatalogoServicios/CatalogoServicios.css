@@ -380,3 +380,51 @@
         flex: 1;
     }
 }
+
+/* ==========================================
+   ACCESIBILIDAD: foco visible con teclado
+========================================== */
+.servicio-card-agendamas:focus-visible,
+.filtro-servicio:focus-visible,
+.btn-ver-mas-link:focus-visible,
+.btn-cantidad-rosa:focus-visible {
+    outline: 2px solid #d4a3b8;
+    outline-offset: 2px;
+}
+
+/* ==========================================
+   CARGANDO: tarjetas de relleno
+========================================== */
+.servicio-skeleton {
+    cursor: default;
+    pointer-events: none;
+}
+
+.skeleton-bloque,
+.skeleton-linea {
+    background: linear-gradient(90deg, #f6edf1 25%, #fdf7fa 50%, #f6edf1 75%);
+    background-size: 200% 100%;
+    animation: skeleton-brillo 1.3s ease-in-out infinite;
+}
+
+.skeleton-linea {
+    height: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+@keyframes skeleton-brillo {
+    from {
+        background-position: 200% 0;
+    }
+    to {
+        background-position: -200% 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-bloque,
+    .skeleton-linea {
+        animation: none;
+    }
+}

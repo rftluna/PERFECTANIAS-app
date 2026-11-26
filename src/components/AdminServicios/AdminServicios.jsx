@@ -2,17 +2,20 @@ import { useEffect, useState } from "react";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useTurno } from "../../context/TurnoContext";
 import { db } from "../../firebase/config";
 import { toast } from "react-toastify";
 import { ReservasAdmin } from "./ReservasAdmin";
 import { ResenasAdmin } from "./ResenasAdmin";
 import { AccesoAdmin } from "./AccesoAdmin";
+import { CATEGORIA_POR_DEFECTO, DURACION_POR_DEFECTO, ORDENES, SECCIONES, SECCION_POR_DEFECTO, categoriasDe, duracionDe, limpiarCategoria, normalizarCategoria, ordenarServicios, seccionDe } from "../../utils/servicios";
 
 const formInicial = {
     name: "",
     price: "",
-    duration: "60",
-    category: "Modelado - Tratamientos",
+    duration: String(DURACION_POR_DEFECTO),
+    seccion: SECCION_POR_DEFECTO,
+    category: CATEGORIA_POR_DEFECTO,
     description: "",
     image: ""
 };
@@ -21,6 +24,8 @@ export const AdminServicios = () => {
     // La sesión viene del AuthContext (el login rosa está en /admin/login).
     const { user: usuario, logout } = useAuth();
     const navigate = useNavigate();
+    // Para que el catálogo público (en memoria) muestre los cambios sin recargar la página.
+    const { cargarServicios: refrescarCatalogoPublico } = useTurno();
 
     const [servicios, setServicios] = useState([]);
     const [loadingServicios, setLoadingServicios] = useState(false);
@@ -30,6 +35,7 @@ export const AdminServicios = () => {
     const [seccion, setSeccion] = useState("reservas");
     const [ordenServicios, setOrdenServicios] = useState("recomendados");
     const [filtroCategoriaAdmin, setFiltroCategoriaAdmin] = useState("todos");
+    const [filtroSeccionAdmin, setFiltroSeccionAdmin] = useState("todas");
 
     const cargarServicios = async () => {
         setLoadingServicios(true);
@@ -51,19 +57,15 @@ export const AdminServicios = () => {
         }
     }, [usuario]);
 
-    // Filtros y orden de la lista "Servicios cargados" (mismos que en Pestañas).
-    const normalizarCat = (cat) => String(cat || "").replace(/["'“”]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
-    const compararNombre = (a, b) => String(a.name || "").localeCompare(String(b.name || ""), "es", { sensitivity: "base" });
-
-    const serviciosVisibles = servicios
-        .filter((srv) => filtroCategoriaAdmin === "todos" || normalizarCat(srv.category) === normalizarCat(filtroCategoriaAdmin))
-        .sort((a, b) => {
-            if (ordenServicios === "precio-asc") return Number(a.price || 0) - Number(b.price || 0) || compararNombre(a, b);
-            if (ordenServicios === "precio-desc") return Number(b.price || 0) - Number(a.price || 0) || compararNombre(a, b);
-            if (ordenServicios === "az") return compararNombre(a, b);
-            if (ordenServicios === "za") return compararNombre(b, a);
-            return 0;
-        });
+    // Filtros y orden de la lista "Servicios cargados" (mismos que en el catálogo público).
+    const categoriasExistentes = categoriasDe(servicios);
+    const serviciosVisibles = ordenarServicios(
+        servicios
+            .filter((srv) => filtroSeccionAdmin === "todas" || seccionDe(srv) === filtroSeccionAdmin)
+            .filter((srv) => filtroCategoriaAdmin === "todos" || normalizarCategoria(srv.category) === normalizarCategoria(filtroCategoriaAdmin)),
+        ordenServicios
+    );
+    const nombreSeccion = (id) => SECCIONES.find((s) => s.id === id)?.nombre || id;
 
     const estiloChip = (activo) => ({
         backgroundColor: activo ? "#d4a3b8" : "#fff7fa",
@@ -89,8 +91,9 @@ export const AdminServicios = () => {
         setForm({
             name: srv.name || "",
             price: srv.price ?? "",
-            duration: srv.duration ?? "60",
-            category: String(srv.category || "Modelado - Tratamientos").replace(/["'“”]/g, "").trim(),
+            duration: String(duracionDe(srv)),
+            seccion: seccionDe(srv),
+            category: limpiarCategoria(srv.category) || CATEGORIA_POR_DEFECTO,
             description: srv.description || "",
             image: srv.image || ""
         });
@@ -112,8 +115,9 @@ export const AdminServicios = () => {
         const payload = {
             name: form.name.trim(),
             price: Number(form.price || 0),
-            duration: Number(form.duration || 60),
-            category: form.category.replace(/["'“”]/g, "").replace(/\s+/g, " ").trim() || "Modelado - Tratamientos",
+            duration: Number(form.duration) > 0 ? Number(form.duration) : DURACION_POR_DEFECTO,
+            seccion: seccionDe(form),
+            category: limpiarCategoria(form.category) || CATEGORIA_POR_DEFECTO,
             description: form.description.trim(),
             image: form.image.trim()
         };
@@ -127,7 +131,7 @@ export const AdminServicios = () => {
                 toast.success("Servicio creado.");
             }
             cancelarEdicion();
-            await cargarServicios();
+            await Promise.all([cargarServicios(), refrescarCatalogoPublico()]);
         } catch (err) {
             toast.error("Error al guardar: " + err.message);
         } finally {
@@ -141,7 +145,7 @@ export const AdminServicios = () => {
             await deleteDoc(doc(db, "servicios", id));
             toast.success("Servicio eliminado.");
             if (editandoId === id) cancelarEdicion();
-            await cargarServicios();
+            await Promise.all([cargarServicios(), refrescarCatalogoPublico()]);
         } catch (err) {
             toast.error("No se pudo eliminar: " + err.message);
         }
@@ -213,12 +217,31 @@ export const AdminServicios = () => {
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="form-label small fw-semibold">Categoría</label>
-                                <select name="category" className="form-select" value={form.category} onChange={handleChange}>
-                                    <option value="Modelado - Tratamientos">Modelado - Tratamientos</option>
-                                    <option value="Combos">Combos</option>
-                                </select>
+                            <div className="row g-2">
+                                <div className="col-6">
+                                    <label className="form-label small fw-semibold" htmlFor="servicio-seccion">
+                                        Sección (pestaña)
+                                    </label>
+                                    <select id="servicio-seccion" name="seccion" className="form-select" value={form.seccion} onChange={handleChange}>
+                                        {SECCIONES.map((sec) => (
+                                            <option key={sec.id} value={sec.id}>
+                                                {sec.nombre}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="col-6">
+                                    <label className="form-label small fw-semibold" htmlFor="servicio-categoria">
+                                        Categoría
+                                    </label>
+                                    {/* Se puede elegir una existente o escribir una nueva: aparece sola como filtro en la web. */}
+                                    <input id="servicio-categoria" type="text" name="category" list="categorias-existentes" className="form-control" value={form.category} onChange={handleChange} required />
+                                    <datalist id="categorias-existentes">
+                                        {[...new Set([CATEGORIA_POR_DEFECTO, "Combos", ...categoriasExistentes])].map((cat) => (
+                                            <option key={cat} value={cat} />
+                                        ))}
+                                    </datalist>
+                                </div>
                             </div>
 
                             <div>
@@ -273,12 +296,15 @@ export const AdminServicios = () => {
                         {/* FILTROS Y ORDEN */}
                         <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                             <div className="d-flex flex-wrap gap-2">
-                                {[
-                                    { id: "todos", texto: "Todos" },
-                                    { id: "Modelado - Tratamientos", texto: "Modelado - Tratamientos" },
-                                    { id: "Combos", texto: "Combos" }
-                                ].map((f) => (
-                                    <button key={f.id} type="button" onClick={() => setFiltroCategoriaAdmin(f.id)} className="btn btn-sm rounded-pill px-3 fw-semibold" style={estiloChip(filtroCategoriaAdmin === f.id)}>
+                                {[{ id: "todas", texto: "Todas las secciones" }, ...SECCIONES.map((sec) => ({ id: sec.id, texto: sec.nombre }))].map((f) => (
+                                    <button key={f.id} type="button" onClick={() => setFiltroSeccionAdmin(f.id)} aria-pressed={filtroSeccionAdmin === f.id} className="btn btn-sm rounded-pill px-3 fw-semibold" style={estiloChip(filtroSeccionAdmin === f.id)}>
+                                        {f.texto}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="d-flex flex-wrap gap-2">
+                                {[{ id: "todos", texto: "Todas las categorías" }, ...categoriasExistentes.map((cat) => ({ id: cat, texto: cat }))].map((f) => (
+                                    <button key={f.id} type="button" onClick={() => setFiltroCategoriaAdmin(f.id)} aria-pressed={filtroCategoriaAdmin === f.id} className="btn btn-sm rounded-pill px-3 fw-semibold" style={estiloChip(filtroCategoriaAdmin === f.id)}>
                                         {f.texto}
                                     </button>
                                 ))}
@@ -293,18 +319,18 @@ export const AdminServicios = () => {
                                     style={{ width: "auto", borderColor: "#ead1dc", color: "#bd829d", fontSize: "12px" }}
                                     aria-label="Ordenar servicios"
                                 >
-                                    <option value="recomendados">Recomendados</option>
-                                    <option value="precio-asc">Menor precio</option>
-                                    <option value="precio-desc">Mayor precio</option>
-                                    <option value="az">Nombre: A → Z</option>
-                                    <option value="za">Nombre: Z → A</option>
+                                    {ORDENES.map((o) => (
+                                        <option key={o.id} value={o.id}>
+                                            {o.texto}
+                                        </option>
+                                    ))}
                                 </select>
                             </label>
                         </div>
                         {loadingServicios ? (
                             <p className="text-muted small">Cargando servicios...</p>
                         ) : serviciosVisibles.length === 0 ? (
-                            <p className="text-muted small">{servicios.length === 0 ? "Todavía no hay servicios cargados." : "No hay servicios en esta categoría."}</p>
+                            <p className="text-muted small">{servicios.length === 0 ? "Todavía no hay servicios cargados." : "No hay servicios con estos filtros."}</p>
                         ) : (
                             <div className="d-flex flex-column gap-3">
                                 {serviciosVisibles.map((srv) => (
@@ -328,7 +354,7 @@ export const AdminServicios = () => {
                                             <div>
                                                 <div className="fw-bold">{srv.name}</div>
                                                 <div className="small text-muted">
-                                                    ${Number(srv.price || 0).toLocaleString("es-AR")} · {srv.duration || 60} min · {srv.category || "General"}
+                                                    ${Number(srv.price || 0).toLocaleString("es-AR")} · {duracionDe(srv)} min · {nombreSeccion(seccionDe(srv))} · {limpiarCategoria(srv.category) || "General"}
                                                 </div>
                                             </div>
                                         </div>

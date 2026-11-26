@@ -181,7 +181,7 @@ export const ResenasAdmin = () => {
                             <input type="url" className="form-control" value={links.linkVer} onChange={(e) => setLinks((p) => ({ ...p, linkVer: e.target.value }))} />
                         </div>
                         <div>
-                            <label className="form-label small fw-semibold">Botón "Dejar reseña"</label>
+                            <label className="form-label small fw-semibold">Botón “Dejar reseña”</label>
                             <input type="url" className="form-control" placeholder="https://g.page/r/.../review" value={links.linkDejar} onChange={(e) => setLinks((p) => ({ ...p, linkDejar: e.target.value }))} />
                             <small className="text-muted">
                                 En tu Perfil de Empresa de Google → <strong>Pedir reseñas</strong> → copiá el link y pegalo acá.

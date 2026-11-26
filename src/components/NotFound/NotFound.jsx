@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { useMetaPagina } from "../../utils/useMetaPagina";
 
 export const NotFound = () => {
+    useMetaPagina("Página no encontrada");
+
     return (
         <section
             className="container text-center d-flex flex-column align-items-center justify-content-center py-5"

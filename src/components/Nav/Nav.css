@@ -60,6 +60,13 @@
     font-weight: 500;
     transition: color 0.2s ease;
     white-space: nowrap;
+    text-decoration: none;
+}
+
+.nav-link-item:focus-visible {
+    outline: 2px solid #d4a3b8;
+    outline-offset: 3px;
+    border-radius: 4px;
 }
 
 .nav-link-item:hover,

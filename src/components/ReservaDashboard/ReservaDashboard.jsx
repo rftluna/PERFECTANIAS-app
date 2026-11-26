@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { useTurno } from "../../context/TurnoContext";
 import { FaTimes, FaChevronRight } from "react-icons/fa";
@@ -9,24 +10,72 @@ import { CalendarioTurnos } from "../CalendarioTurnos/CalendarioTurnos";
 import { FormaPago } from "../FormaPago/FormaPago";
 import { FormularioCliente } from "../FormularioCliente/FormularioCliente";
 import { ResenasGoogle } from "../ResenasGoogle/ResenasGoogle";
+import { NotFound } from "../NotFound/NotFound";
+import { SENA_TEXTO, duracionDe, formatearMoneda, seccionDe } from "../../utils/servicios";
+import { useMetaPagina } from "../../utils/useMetaPagina";
+
+// Configuración de cada pestaña pública: título del catálogo y datos para SEO.
+const PAGINAS = {
+    inicio: {
+        seccion: null,
+        tituloCatalogo: "Elegí servicios",
+        tituloPagina: "Pestañas y uñas: reservá tu turno online",
+        descripcion: "Reservá tu turno online en Perfectanias: extensiones de pestañas, modelado y tratamientos en Isidro Casanova, Morón y Ramos Mejía.",
+        ruta: "/"
+    },
+    pestanas: {
+        seccion: "pestanas",
+        tituloCatalogo: "Elegí servicios de pestañas y cejas",
+        tituloPagina: "Pestañas y cejas",
+        descripcion: "Extensiones, lifting y tratamientos de pestañas y cejas en Perfectanias. Mirá precios, duración y seña, y reservá tu turno online.",
+        ruta: "/category/pestanas"
+    },
+    unas: {
+        seccion: "unas",
+        tituloCatalogo: "Elegí servicios de uñas",
+        tituloPagina: "Uñas",
+        descripcion: "Servicios de uñas en Perfectanias. Reservá tu turno online.",
+        ruta: "/category/unas"
+    },
+    turnos: {
+        seccion: null,
+        tituloPagina: "Mis turnos",
+        descripcion: "Consultá y administrá tus turnos en Perfectanias.",
+        ruta: "/turnos"
+    }
+};
 
 export const ReservaDashboard = () => {
     const { category } = useParams();
     const { pathname } = useLocation();
 
-    const { paso, setPaso, serviciosSeleccionados, toggleServicio, getTotal, sucursal, setSucursal, fechaSeleccionada, horaSeleccionada } = useTurno();
+    const { paso, setPaso, serviciosSeleccionados, toggleServicio, getTotal, getSena, sucursal, setSucursal, fechaSeleccionada, horaSeleccionada, servicios, cargandoServicios } = useTurno();
 
-    const seccionActual = category || pathname.replace(/^\/+/, "");
-    const seccionProximamente = seccionActual === "unas" || seccionActual === "turnos";
+    const seccionActual = category || pathname.replace(/^\/+/, "") || "inicio";
+    const pagina = PAGINAS[seccionActual];
+
+    useMetaPagina(pagina?.tituloPagina || "Página no encontrada", pagina?.descripcion, pagina?.ruta);
+
+    // Al cambiar de pestaña se vuelve al catálogo (la selección de servicios se conserva).
+    useEffect(() => {
+        setPaso((pasoActual) => (pasoActual > 2 ? 1 : pasoActual));
+    }, [seccionActual, setPaso]);
+
     const esSeccionUnas = seccionActual === "unas";
+    // Uñas queda en "Próximamente" hasta que se cargue al menos un servicio de esa sección desde el panel.
+    const hayServiciosUnas = servicios.some((s) => seccionDe(s) === "unas");
+    const seccionProximamente = seccionActual === "turnos" || (esSeccionUnas && !cargandoServicios && !hayServiciosUnas);
     const mostrarModalSucursal = !seccionProximamente;
 
     const cantidadTotalServicios = serviciosSeleccionados.reduce((acc, s) => acc + Math.max(1, Number(s.cantidad || 1)), 0);
     const totalReserva = getTotal();
-    const senaHoy = Math.round(totalReserva * 0.5);
-    const minutosTotales = serviciosSeleccionados.reduce((acc, s) => acc + Number(s.duration || 90) * Math.max(1, Number(s.cantidad || 1)), 0);
+    const senaHoy = getSena();
+    const minutosTotales = serviciosSeleccionados.reduce((acc, s) => acc + duracionDe(s) * Math.max(1, Number(s.cantidad || 1)), 0);
 
-    const formatearMoneda = (valor) => Number(valor || 0).toLocaleString("es-AR");
+    // /category/<cualquier-cosa> que no sea una pestaña real muestra la 404.
+    if (!pagina) {
+        return <NotFound />;
+    }
 
     const handleCompartir = async () => {
         const urlActual = window.location.href;
@@ -124,7 +173,7 @@ export const ReservaDashboard = () => {
                 <div className="row g-4 mt-1">
                     {/* COLUMNA IZQUIERDA */}
                     <div className="col-lg-8 col-md-7 col-12">
-                        {(paso === 1 || paso === 2) && <CatalogoServicios />}
+                        {(paso === 1 || paso === 2) && <CatalogoServicios key={seccionActual} seccion={pagina.seccion} titulo={pagina.tituloCatalogo} />}
                         {paso === 3 && <CalendarioTurnos />}
                         {paso === 4 && <FormaPago />}
                         {paso === 5 && <FormularioCliente />}
@@ -173,7 +222,7 @@ export const ReservaDashboard = () => {
                                                             {s.name} {cant > 1 ? `(x${cant})` : ""}
                                                         </div>
                                                         <span className="text-muted" style={{ fontSize: "11px" }}>
-                                                            {s.duration || 90} min · ${formatearMoneda(subtotal)}
+                                                            {duracionDe(s)} min · ${formatearMoneda(subtotal)}
                                                         </span>
                                                     </div>
                                                     <button type="button" onClick={() => toggleServicio(s)} className="btn btn-sm p-0 text-muted" title="Quitar servicio">
@@ -227,7 +276,7 @@ export const ReservaDashboard = () => {
                                     <span>${formatearMoneda(totalReserva)}</span>
                                 </div>
                                 <div className="d-flex justify-content-between small text-muted mb-3">
-                                    <span>Seña hoy (50%)</span>
+                                    <span>Seña hoy ({SENA_TEXTO})</span>
                                     <strong className="text-dark">${formatearMoneda(senaHoy)}</strong>
                                 </div>
 

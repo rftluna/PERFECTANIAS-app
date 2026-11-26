@@ -1,8 +1,9 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { collection, doc, getDocs, query, where, runTransaction } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { toast } from "react-toastify";
 import emailjs from "@emailjs/browser";
+import { SENA_TEXTO, calcularSena } from "../utils/servicios";
 
 const TurnoContext = createContext();
 
@@ -35,8 +36,34 @@ export const TurnoProvider = ({ children }) => {
 
     const [loading, setLoading] = useState(false);
 
+    // Catálogo de servicios: se carga una sola vez y lo comparten todas las pestañas.
+    const [servicios, setServicios] = useState([]);
+    const [cargandoServicios, setCargandoServicios] = useState(true);
+    const [errorServicios, setErrorServicios] = useState(false);
+
+    const cargarServicios = useCallback(async () => {
+        setCargandoServicios(true);
+        setErrorServicios(false);
+        try {
+            const snapshot = await getDocs(collection(db, "servicios"));
+            setServicios(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+        } catch (error) {
+            console.error("Error al cargar servicios de Firestore:", error);
+            setErrorServicios(true);
+        } finally {
+            setCargandoServicios(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        cargarServicios();
+    }, [cargarServicios]);
+
     // Calcula el importe total de los servicios seleccionados.
     const getTotal = () => serviciosSeleccionados.reduce((sum, servicio) => sum + Number(servicio.price || 0) * Number(servicio.cantidad || 1), 0);
+
+    // Seña a abonar sobre el total seleccionado.
+    const getSena = () => calcularSena(getTotal());
 
     // Obtiene la cantidad seleccionada de un servicio.
     const getCantidadServicio = (servicioId) => {
@@ -309,7 +336,7 @@ export const TurnoProvider = ({ children }) => {
 
             const totalCalculado = getTotal();
 
-            const senaCalculada = Math.round(totalCalculado * 0.5);
+            const senaCalculada = calcularSena(totalCalculado);
 
             const formatearMonto = (numero) => Number(numero || 0).toLocaleString("es-AR");
 
@@ -437,7 +464,7 @@ export const TurnoProvider = ({ children }) => {
 
                             sena: `$${formatearMonto(senaCalculada)}`,
 
-                            forma_pago: `${formaPago} (50% de seña)`,
+                            forma_pago: `${formaPago} (${SENA_TEXTO} de seña)`,
 
                             notas: datosCliente.notas.trim() || "Sin indicaciones",
 
@@ -504,6 +531,11 @@ export const TurnoProvider = ({ children }) => {
                 paso,
                 setPaso,
 
+                servicios,
+                cargandoServicios,
+                errorServicios,
+                cargarServicios,
+
                 sucursal,
                 setSucursal,
 
@@ -529,6 +561,7 @@ export const TurnoProvider = ({ children }) => {
                 setDatosCliente,
 
                 getTotal,
+                getSena,
                 verificarDisponibilidadHora,
 
                 finalizarReserva,

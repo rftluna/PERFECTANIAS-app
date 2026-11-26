@@ -1,50 +1,60 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../firebase/config";
+import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useTurno } from "../../context/TurnoContext";
-import { Container, Row, Col, Spinner } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import { FaCheckCircle, FaChevronRight, FaSearch } from "react-icons/fa";
+import { ORDENES, calcularSena, categoriasDe, duracionDe, formatearMoneda, limpiarCategoria, normalizarCategoria, ordenarServicios, seccionDe } from "../../utils/servicios";
 import "./CatalogoServicios.css";
 
-export const CatalogoServicios = () => {
-    const { category } = useParams();
-    const { serviciosSeleccionados, toggleServicio, ajustarCantidadServicio, getCantidadServicio } = useTurno();
+// Tarjetas grises mientras carga el catálogo.
+const CatalogoCargando = () => (
+    <Row className="g-3" aria-busy="true" aria-label="Cargando servicios">
+        {[0, 1, 2, 3].map((i) => (
+            <Col xs={12} md={6} key={i}>
+                <div className="servicio-card-agendamas servicio-skeleton" aria-hidden="true">
+                    <div className="servicio-thumb-cuadrada skeleton-bloque" />
+                    <div className="servicio-info-central w-100">
+                        <div className="skeleton-linea" style={{ width: "70%" }} />
+                        <div className="skeleton-linea" style={{ width: "35%" }} />
+                        <div className="skeleton-linea" style={{ width: "55%" }} />
+                        <div className="skeleton-linea" style={{ width: "90%" }} />
+                    </div>
+                </div>
+            </Col>
+        ))}
+    </Row>
+);
 
-    const [servicios, setServicios] = useState([]);
-    const [loading, setLoading] = useState(true);
+// seccion: "pestanas" | "unas" filtra el catálogo; sin valor (Inicio) muestra todos los servicios.
+export const CatalogoServicios = ({ seccion = null, titulo = "Elegí servicios" }) => {
+    const { servicios: todosLosServicios, cargandoServicios, errorServicios, cargarServicios, serviciosSeleccionados, toggleServicio, ajustarCantidadServicio, getCantidadServicio } = useTurno();
+
     const [descripcionExpandida, setDescripcionExpandida] = useState({});
-    const [filtroCategoria, setFiltroCategoria] = useState("todos");
-    const [busqueda, setBusqueda] = useState("");
-    const [orden, setOrden] = useState("recomendados");
 
-    const esSeccionPestanas = category === "pestanas";
+    // Filtro, búsqueda y orden viven en la URL (?categoria=&q=&orden=),
+    // así el enlace de "Compartir" lleva lo que la clienta está viendo y "atrás" funciona.
+    const [searchParams, setSearchParams] = useSearchParams();
+    const filtroCategoria = searchParams.get("categoria") || "todos";
+    const busqueda = searchParams.get("q") || "";
+    const ordenParam = searchParams.get("orden");
+    const orden = ORDENES.some((o) => o.id === ordenParam) ? ordenParam : "recomendados";
 
-    useEffect(() => {
-        setFiltroCategoria("todos");
-        setDescripcionExpandida({});
-        setBusqueda("");
-        setOrden("recomendados");
-    }, [category]);
+    const actualizarParam = (clave, valor, valorPorDefecto, reemplazar = false) => {
+        setSearchParams(
+            (prev) => {
+                const siguiente = new URLSearchParams(prev);
+                if (!valor || valor === valorPorDefecto) siguiente.delete(clave);
+                else siguiente.set(clave, valor);
+                return siguiente;
+            },
+            { replace: reemplazar }
+        );
+    };
 
-    useEffect(() => {
-        const fetchServicios = async () => {
-            try {
-                const querySnapshot = await getDocs(collection(db, "servicios"));
-                const dataMapeada = querySnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                setServicios(dataMapeada);
-            } catch (error) {
-                console.error("Error al cargar servicios de Firestore:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const servicios = seccion ? todosLosServicios.filter((srv) => seccionDe(srv) === seccion) : todosLosServicios;
 
-        fetchServicios();
-    }, []);
+    // Los filtros salen de las categorías cargadas en el panel (no están escritos a mano).
+    const categorias = categoriasDe(servicios);
 
     const manejarDescripcion = (e, id) => {
         e.stopPropagation(); // Evita que al tocar "Ver más" se seleccione/deseleccione el servicio
@@ -54,18 +64,18 @@ export const CatalogoServicios = () => {
         }));
     };
 
-    const formatearMoneda = (valor) => {
-        return Number(valor || 0).toLocaleString("es-AR");
+    // Teclado: Enter o Espacio sobre la tarjeta la elige (solo si el foco está en la tarjeta, no en sus botones).
+    const manejarTeclaTarjeta = (e, srv) => {
+        if (e.target !== e.currentTarget) return;
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleServicio(srv);
+        }
     };
 
-    // Filtrado por categoría y buscador
-    // Limpia la categoría: saca comillas y espacios de más, así un error de tipeo no esconde el servicio.
-    const normalizarCategoria = (cat) => String(cat || "").replace(/["'“”]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
-
     const serviciosFiltrados = servicios.filter((srv) => {
-        const categoriaSrv = normalizarCategoria(srv.category);
-        // En "Todos" se muestran todos los servicios cargados (aunque tengan otra categoría).
-        const coincideCategoria = filtroCategoria === "todos" ? true : categoriaSrv === normalizarCategoria(filtroCategoria);
+        // En "Todos" se muestran todos los servicios de la sección (aunque tengan otra categoría).
+        const coincideCategoria = filtroCategoria === "todos" || normalizarCategoria(srv.category) === normalizarCategoria(filtroCategoria);
 
         const termino = busqueda.trim().toLowerCase();
         const coincideBusqueda = !termino || (srv.name && srv.name.toLowerCase().includes(termino)) || (srv.description && srv.description.toLowerCase().includes(termino));
@@ -73,86 +83,93 @@ export const CatalogoServicios = () => {
         return coincideCategoria && coincideBusqueda;
     });
 
-    // Orden elegido por la clienta (en Inicio y en Pestañas).
-    const compararNombre = (a, b) => String(a.name || "").localeCompare(String(b.name || ""), "es", { sensitivity: "base" });
-    const serviciosOrdenados = orden === "recomendados"
-        ? serviciosFiltrados
-        : [...serviciosFiltrados].sort((a, b) => {
-              if (orden === "precio-asc") return Number(a.price || 0) - Number(b.price || 0) || compararNombre(a, b);
-              if (orden === "precio-desc") return Number(b.price || 0) - Number(a.price || 0) || compararNombre(a, b);
-              if (orden === "az") return compararNombre(a, b);
-              if (orden === "za") return compararNombre(b, a);
-              return 0;
-          });
-
-    if (loading) {
-        return (
-            <div className="text-center py-5">
-                <Spinner animation="border" style={{ color: "#d4a3b8" }} />
-                <p className="text-muted mt-2 small">Cargando catálogo estético...</p>
-            </div>
-        );
-    }
+    const serviciosOrdenados = ordenarServicios(serviciosFiltrados, orden);
 
     return (
         <Container fluid className="p-0 catalogo-servicios">
             {/* CABECERA CON TÍTULO Y BUSCADOR */}
             <div className="catalogo-header-bar">
                 <div>
-                    <h4 className="catalogo-titulo">{esSeccionPestanas ? "Elegí servicios de pestañas y cejas" : "Elegí servicios"}</h4>
+                    <h2 className="catalogo-titulo">{titulo}</h2>
                     <p className="catalogo-subtitulo">Podés reservar uno o más servicios.</p>
                 </div>
 
                 <div className="buscador-servicios-box">
-                    <input type="text" className="buscador-servicios-input" placeholder="Buscar servicio..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
-                    <FaSearch className="buscador-servicios-icon" />
+                    <input
+                        type="search"
+                        className="buscador-servicios-input"
+                        placeholder="Buscar servicio..."
+                        aria-label="Buscar servicio"
+                        value={busqueda}
+                        onChange={(e) => actualizarParam("q", e.target.value, "", true)}
+                    />
+                    <FaSearch className="buscador-servicios-icon" aria-hidden="true" />
                 </div>
             </div>
 
-            {/* FILTROS Y ORDEN (siempre visibles) */}
-            {(
-                <div className="filtros-y-orden">
-                <div className="filtros-servicios">
-                    <button type="button" className={`filtro-servicio ${filtroCategoria === "todos" ? "activo" : ""}`} onClick={() => setFiltroCategoria("todos")}>
-                        Todos
-                    </button>
-                    <button type="button" className={`filtro-servicio ${filtroCategoria === "Modelado - Tratamientos" ? "activo" : ""}`} onClick={() => setFiltroCategoria("Modelado - Tratamientos")}>
-                        Modelado - Tratamientos
-                    </button>
-                    <button type="button" className={`filtro-servicio ${filtroCategoria === "Combos" ? "activo" : ""}`} onClick={() => setFiltroCategoria("Combos")}>
-                        Combos
-                    </button>
+            {/* FILTROS Y ORDEN */}
+            <div className="filtros-y-orden">
+                <div className="filtros-servicios" role="group" aria-label="Filtrar por categoría">
+                    {["todos", ...categorias].map((cat) => {
+                        const activo = cat === "todos" ? filtroCategoria === "todos" : normalizarCategoria(filtroCategoria) === normalizarCategoria(cat);
+                        return (
+                            <button
+                                key={cat}
+                                type="button"
+                                className={`filtro-servicio ${activo ? "activo" : ""}`}
+                                aria-pressed={activo}
+                                onClick={() => actualizarParam("categoria", cat === "todos" ? "" : limpiarCategoria(cat), "")}
+                            >
+                                {cat === "todos" ? "Todos" : cat}
+                            </button>
+                        );
+                    })}
                 </div>
 
                 <label className="orden-servicios">
                     <span>Ordenar:</span>
-                    <select value={orden} onChange={(e) => setOrden(e.target.value)} aria-label="Ordenar servicios">
-                        <option value="recomendados">Recomendados</option>
-                        <option value="precio-asc">Menor precio</option>
-                        <option value="precio-desc">Mayor precio</option>
-                        <option value="az">Nombre: A → Z</option>
-                        <option value="za">Nombre: Z → A</option>
+                    <select value={orden} onChange={(e) => actualizarParam("orden", e.target.value, "recomendados")} aria-label="Ordenar servicios">
+                        {ORDENES.map((o) => (
+                            <option key={o.id} value={o.id}>
+                                {o.texto}
+                            </option>
+                        ))}
                     </select>
                 </label>
-                </div>
-            )}
+            </div>
 
             {/* GRILLA DE 2 COLUMNAS ESTILO AGENDAMAS */}
-            {serviciosOrdenados.length > 0 ? (
+            {cargandoServicios ? (
+                <CatalogoCargando />
+            ) : errorServicios ? (
+                <div className="catalogo-vacio" role="alert">
+                    <span>😢</span>
+                    <p>No pudimos cargar los servicios.</p>
+                    <button type="button" className="filtro-servicio activo" onClick={cargarServicios}>
+                        Reintentar
+                    </button>
+                </div>
+            ) : serviciosOrdenados.length > 0 ? (
                 <Row className="g-3">
                     {serviciosOrdenados.map((srv) => {
                         const cantidad = getCantidadServicio(srv.id);
                         const elegido = cantidad > 0 || serviciosSeleccionados.some((s) => s.id === srv.id);
                         const expandida = descripcionExpandida[srv.id] === true;
                         const precioNum = Number(srv.price || 0);
-                        const senaNum = Math.round(precioNum * 0.5);
-                        const tieneDuracion = srv.duration !== undefined && srv.duration !== null && srv.duration !== "";
-                        const duracionTexto = tieneDuracion ? `${srv.duration} min` : null;
+                        const senaNum = calcularSena(precioNum);
                         const descripcion = typeof srv.description === "string" && srv.description.trim() ? srv.description.trim() : "Tratamiento estético personalizado realizado por especialistas.";
 
                         return (
                             <Col xs={12} md={6} key={srv.id}>
-                                <div className={`servicio-card-agendamas ${elegido ? "servicio-elegido" : ""}`} onClick={() => toggleServicio(srv)}>
+                                <div
+                                    className={`servicio-card-agendamas ${elegido ? "servicio-elegido" : ""}`}
+                                    role="button"
+                                    tabIndex={0}
+                                    aria-pressed={elegido}
+                                    aria-label={`${srv.name}, $${formatearMoneda(precioNum)}${elegido ? ", elegido" : ""}`}
+                                    onClick={() => toggleServicio(srv)}
+                                    onKeyDown={(e) => manejarTeclaTarjeta(e, srv)}
+                                >
                                     {/* ENUMERADOR ROSA SOBRE LA ETIQUETA */}
                                     {cantidad > 0 && (
                                         <span className="enumerador-rosa-badge" aria-label={`Cantidad elegida: ${cantidad}`}>
@@ -175,24 +192,24 @@ export const CatalogoServicios = () => {
 
                                     {/* DATOS DEL SERVICIO */}
                                     <div className="servicio-info-central">
-                                        <h6 className="servicio-nombre">{srv.name}</h6>
+                                        <h3 className="servicio-nombre">{srv.name}</h3>
                                         <div className="servicio-precio">${formatearMoneda(precioNum)}</div>
 
-                                        <div className="servicio-meta-sena">{duracionTexto ? `${duracionTexto} · Seña $${formatearMoneda(senaNum)}` : `- Seña $${formatearMoneda(senaNum)}`}</div>
+                                        <div className="servicio-meta-sena">{`${duracionDe(srv)} min · Seña $${formatearMoneda(senaNum)}`}</div>
 
                                         <p className={`servicio-descripcion ${expandida ? "expandida" : ""}`}>{descripcion}</p>
 
                                         <div className="servicio-acciones-fila">
-                                            <button type="button" className="btn-ver-mas-link" onClick={(e) => manejarDescripcion(e, srv.id)}>
+                                            <button type="button" className="btn-ver-mas-link" aria-expanded={expandida} onClick={(e) => manejarDescripcion(e, srv.id)}>
                                                 {expandida ? "Ver menos" : "Ver más"}
                                             </button>
 
-                                            <div className="controles-cantidad-servicio" onClick={(e) => e.stopPropagation()}>
-                                                <button type="button" className="btn-cantidad-rosa" onClick={() => ajustarCantidadServicio(srv, -1)} aria-label="Restar cantidad">
+                                            <div className="controles-cantidad-servicio" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+                                                <button type="button" className="btn-cantidad-rosa" onClick={() => ajustarCantidadServicio(srv, -1)} aria-label={`Restar una unidad de ${srv.name}`}>
                                                     −
                                                 </button>
                                                 <span className="valor-cantidad-servicio">{cantidad}</span>
-                                                <button type="button" className="btn-cantidad-rosa" onClick={() => ajustarCantidadServicio(srv, 1)} aria-label="Sumar cantidad">
+                                                <button type="button" className="btn-cantidad-rosa" onClick={() => ajustarCantidadServicio(srv, 1)} aria-label={`Sumar una unidad de ${srv.name}`}>
                                                     +
                                                 </button>
                                             </div>
@@ -200,7 +217,7 @@ export const CatalogoServicios = () => {
                                     </div>
 
                                     {/* FLECHA O CHECK DE SELECCIÓN */}
-                                    <div className="servicio-accion-derecha">{elegido ? <FaCheckCircle /> : <FaChevronRight />}</div>
+                                    <div className="servicio-accion-derecha" aria-hidden="true">{elegido ? <FaCheckCircle /> : <FaChevronRight />}</div>
                                 </div>
                             </Col>
                         );
@@ -209,7 +226,7 @@ export const CatalogoServicios = () => {
             ) : (
                 <div className="catalogo-vacio">
                     <span>✨</span>
-                    <p>No encontramos servicios que coincidan con tu búsqueda.</p>
+                    <p>{servicios.length === 0 ? "Todavía no hay servicios cargados en esta sección." : "No encontramos servicios que coincidan con tu búsqueda."}</p>
                 </div>
             )}
         </Container>
