@@ -30,8 +30,9 @@ export const Login = () => {
     const [esperaEnvio, setEsperaEnvio] = useState(0);
 
     // Cuenta regresiva del bloqueo y de la espera entre envíos de mail.
+    const hayCuentaRegresiva = bloqueoMs > 0 || esperaEnvio > 0;
     useEffect(() => {
-        if (bloqueoMs <= 0 && esperaEnvio <= 0) return;
+        if (!hayCuentaRegresiva) return;
         const id = setInterval(() => {
             const restante = tiempoBloqueoRestante();
             setBloqueoMs(restante);
@@ -39,7 +40,7 @@ export const Login = () => {
             setEsperaEnvio((s) => Math.max(0, s - 1));
         }, 1000);
         return () => clearInterval(id);
-    }, [bloqueoMs > 0, esperaEnvio > 0]);
+    }, [hayCuentaRegresiva]);
 
     // Si ya hay sesión iniciada, va directo al panel.
     if (user) return <Navigate to="/admin" replace />;

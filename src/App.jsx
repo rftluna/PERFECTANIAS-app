@@ -2,6 +2,7 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
 
@@ -10,13 +11,17 @@ import { TurnoProvider } from "./context/TurnoContext";
 import { Nav } from "./components/Nav/Nav";
 import { Footer } from "./components/Footer/Footer";
 import { ReservaDashboard } from "./components/ReservaDashboard/ReservaDashboard";
-import { AdminServicios } from "./components/AdminServicios/AdminServicios";
 import { NotFound } from "./components/NotFound/NotFound";
 import { UbicacionMapa } from "./components/UbicacionMapa/UbicacionMapa";
 
 // 3. IMPORTACIONES DE AUTENTICACIÓN
-import { Login } from "./components/Login/Login";
 import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
+
+// El panel y el login se descargan solo cuando alguien entra a /admin (las clientas no los bajan).
+const AdminServicios = lazy(() => import("./components/AdminServicios/AdminServicios").then((m) => ({ default: m.AdminServicios })));
+const Login = lazy(() => import("./components/Login/Login").then((m) => ({ default: m.Login })));
+
+const CargandoPagina = () => <p className="text-center text-muted py-5">Cargando...</p>;
 
 function App() {
     return (
@@ -30,6 +35,7 @@ function App() {
 
                 {/* ENRUTADOR PRINCIPAL DENTRO DEL CUERPO DE LA APP */}
                 <main className="flex-grow-1">
+                    <Suspense fallback={<CargandoPagina />}>
                     <Routes>
                         {/* RUTAS PÚBLICAS */}
                         <Route path="/" element={<ReservaDashboard />} />
@@ -52,6 +58,7 @@ function App() {
                         {/* PÁGINA 404 PARA CUALQUIER RUTA INEXISTENTE */}
                         <Route path="*" element={<NotFound />} />
                     </Routes>
+                    </Suspense>
                 </main>
 
                 {/* MAPA DE UBICACIÓN DE LAS SUCURSALES, ARRIBA DEL FOOTER */}

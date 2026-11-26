@@ -25,7 +25,7 @@ export default defineConfig([
       // El proyecto no usa PropTypes.
       'react/prop-types': 'off',
       // Contextos y helpers exportan hooks junto al Provider: es intencional.
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true, allowExportNames: ['useAuth', 'useTurno', 'ADMIN_UID'] }],
     },
   },
 ])

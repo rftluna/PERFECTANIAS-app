@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { toast } from "react-toastify";
-import { Estrellas, LINKS_POR_DEFECTO, LINK_MAPS_PERFECTANIAS, calcularPromedio, formatearFechaResena, formatearPuntaje } from "../ResenasGoogle/ResenasGoogle";
+import { Estrellas } from "../ResenasGoogle/ResenasGoogle";
+import { LINKS_POR_DEFECTO, LINK_MAPS_PERFECTANIAS, calcularPromedio, formatearFechaResena, formatearPuntaje } from "../ResenasGoogle/resenasUtils";
 
 const ROSA = "#d4a3b8";
 
