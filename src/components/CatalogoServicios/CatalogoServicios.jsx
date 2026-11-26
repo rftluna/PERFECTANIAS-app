@@ -5,6 +5,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import { FaCheckCircle, FaChevronRight, FaSearch } from "react-icons/fa";
 import { ORDENES, calcularSena, categoriasDe, duracionDe, formatearMoneda, limpiarCategoria, normalizarCategoria, ordenarServicios, seccionDe } from "../../utils/servicios";
 import { FotoServicio } from "../IlustracionServicio/IlustracionServicio";
+import { fotoReferenciaDe } from "../../utils/fotosReferencia";
 import "./CatalogoServicios.css";
 
 // Tarjetas grises mientras carga el catálogo.
@@ -189,6 +190,20 @@ export const CatalogoServicios = ({ seccion = null, titulo = "Elegí servicios" 
                                         <div className="servicio-meta-sena">{`${duracionDe(srv)} min · Seña $${formatearMoneda(senaNum)}`}</div>
 
                                         <p className={`servicio-descripcion ${expandida ? "expandida" : ""}`}>{descripcion}</p>
+
+                                        {/* Crédito de la foto de referencia (lo pide la licencia de Unsplash) */}
+                                        {!srv.image && fotoReferenciaDe(srv.name) && (
+                                            <p className="foto-referencia-credito" onClick={(e) => e.stopPropagation()}>
+                                                Foto de referencia:{" "}
+                                                <a href={fotoReferenciaDe(srv.name).autorLink} target="_blank" rel="noreferrer">
+                                                    {fotoReferenciaDe(srv.name).autor}
+                                                </a>{" "}
+                                                /{" "}
+                                                <a href={fotoReferenciaDe(srv.name).unsplashLink} target="_blank" rel="noreferrer">
+                                                    Unsplash
+                                                </a>
+                                            </p>
+                                        )}
 
                                         <div className="servicio-acciones-fila">
                                             <button type="button" className="btn-ver-mas-link" aria-expanded={expandida} onClick={(e) => manejarDescripcion(e, srv.id)}>

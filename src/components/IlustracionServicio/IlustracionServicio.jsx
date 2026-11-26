@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { fotoReferenciaDe } from "../../utils/fotosReferencia";
 
 // Ilustración rosa para los servicios que todavía no tienen foto.
 // Se elige según el nombre del servicio y muestra la diferencia entre técnicas:
@@ -185,13 +186,25 @@ export const IlustracionServicio = ({ nombre }) => {
     );
 };
 
-// Foto del servicio; si no tiene o no carga, muestra la ilustración.
+// Foto del servicio. Si no tiene, usa una foto de referencia de la técnica (Unsplash);
+// si tampoco hay o no carga, muestra la ilustración.
 export const FotoServicio = ({ servicio, className = "" }) => {
-    const [fallo, setFallo] = useState(false);
-    const usarFoto = servicio?.image && !fallo;
-    return (
-        <div className={className}>
-            {usarFoto ? <img src={servicio.image} alt={servicio.name || "Servicio"} loading="lazy" onError={() => setFallo(true)} /> : <IlustracionServicio nombre={servicio?.name || ""} />}
-        </div>
-    );
+    const [fallo, setFallo] = useState({ propia: false, referencia: false });
+    const referencia = fotoReferenciaDe(servicio?.name);
+
+    let contenido;
+    if (servicio?.image && !fallo.propia) {
+        contenido = <img src={servicio.image} alt={servicio.name || "Servicio"} loading="lazy" onError={() => setFallo((f) => ({ ...f, propia: true }))} />;
+    } else if (referencia && !fallo.referencia) {
+        contenido = (
+            <>
+                <img src={referencia.url} alt={`Foto de referencia de ${servicio.name}`} title={`Foto de referencia: ${referencia.autor} / Unsplash`} loading="lazy" onError={() => setFallo((f) => ({ ...f, referencia: true }))} />
+                <span className="foto-referencia-etiqueta">Referencia</span>
+            </>
+        );
+    } else {
+        contenido = <IlustracionServicio nombre={servicio?.name || ""} />;
+    }
+
+    return <div className={`${className} foto-servicio-contenedor`}>{contenido}</div>;
 };
