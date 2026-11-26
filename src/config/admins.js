@@ -1,9 +1,8 @@
-// Cuentas con acceso completo al panel /admin (por UID: siguen valiendo aunque cambien email o clave).
-// El UID se ve en Firebase Console → Authentication → Usuarios → columna "UID de usuario".
-// ⚠️ Si agregás o sacás una cuenta, hacé el mismo cambio en firestore.rules (función esAdmin)
-//    y publicá las reglas en Firebase Console → Firestore → Reglas.
-export const ADMIN_UIDS = [
-    "OgWsAMKDYgQN8AhgDwjSvIzfjq72" // Dueña
-];
+// Cuenta de la dueña: siempre es administradora (por UID, vale aunque cambie email o clave).
+// Las demás administradoras se suman con invitación desde /admin → Equipo
+// y quedan guardadas en la colección "admins" de Firestore.
+// ⚠️ Este UID tiene que ser el mismo que el de firestore.rules (función esDuena).
+export const DUENA_UID = "OgWsAMKDYgQN8AhgDwjSvIzfjq72";
 
-export const esCuentaAdmin = (user) => Boolean(user && ADMIN_UIDS.includes(user.uid));
+// Días que dura un link de invitación.
+export const DIAS_VALIDEZ_INVITACION = 7;

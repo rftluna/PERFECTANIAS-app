@@ -1,10 +1,9 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { esCuentaAdmin } from "../../config/admins";
 
 
 export const ProtectedRoute = ({ children }) => {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, esAdmin, logout } = useAuth();
 
   // Esperamos a saber si hay usuario antes de redirigir.
   if (loading) return <p className="text-center text-muted py-5">Cargando...</p>;
@@ -12,7 +11,7 @@ export const ProtectedRoute = ({ children }) => {
   if (!user) return <Navigate to="/admin/login" replace />;
 
   // Hay sesión, pero no es una de las cuentas administradoras: no se muestra el panel.
-  if (!esCuentaAdmin(user)) {
+  if (!esAdmin) {
     return (
       <div className="container py-5 text-center" style={{ maxWidth: "420px" }}>
         <h5 className="fw-bold mb-2" style={{ color: "#c47d9d" }}>Sin acceso</h5>
