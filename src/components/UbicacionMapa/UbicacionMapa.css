@@ -1,0 +1,102 @@
+/* ==========================================
+   PERFECTANIAS - MAPA DE SUCURSALES
+   Mismo estilo rosa que los filtros del catálogo.
+========================================== */
+
+.mapa-titulo {
+    color: #d4a3b8;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.mapa-sucursales {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.mapa-sucursal-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid #ead1dc;
+    background: #fff7fa;
+    color: #bd829d;
+    padding: 7px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.mapa-sucursal-btn:hover {
+    background: #f4e0e9;
+    border-color: #d4a3b8;
+    transform: translateY(-1px);
+}
+
+.mapa-sucursal-btn.activo {
+    background: #d4a3b8;
+    border-color: #d4a3b8;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(212, 163, 184, 0.35);
+}
+
+.mapa-sucursal-btn:focus-visible,
+.mapa-como-llegar:focus-visible {
+    outline: 2px solid #d4a3b8;
+    outline-offset: 2px;
+}
+
+.mapa-marco {
+    border: 1px solid #f1e3e9;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(196, 125, 157, 0.12);
+}
+
+.mapa-direccion {
+    color: #987587;
+    font-size: 13px;
+}
+
+.mapa-como-llegar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #e8b4c8;
+    color: #2c282c;
+    border-radius: 999px;
+    padding: 7px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.mapa-como-llegar:hover {
+    background: #d4a3b8;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mapa-sucursal-btn,
+    .mapa-como-llegar {
+        transition: none;
+    }
+    .mapa-sucursal-btn:hover,
+    .mapa-como-llegar:hover {
+        transform: none;
+    }
+}

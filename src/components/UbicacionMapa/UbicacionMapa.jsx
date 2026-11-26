@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useTurno } from "../../context/TurnoContext";
+import { FaMapMarkerAlt, FaRoute } from "react-icons/fa";
+import "./UbicacionMapa.css";
 
 const SUCURSALES = [
   { id: "casanova", nombre: "Isidro Casanova", direccion: "República de Portugal 2812, Isidro Casanova, Provincia de Buenos Aires" },
@@ -20,24 +22,26 @@ export const UbicacionMapa = () => {
 
   return (
     <section className="container py-4">
-      <h5 className="fw-bold text-center mb-3" style={{ color: "#d4a3b8" }}>
+      <h5 className="mapa-titulo text-center mb-3">
         Dónde estamos
       </h5>
 
-      <div className="d-flex flex-wrap justify-content-center gap-2 mb-3">
+      <div className="mapa-sucursales" role="group" aria-label="Elegí una sucursal">
         {SUCURSALES.map((s) => (
           <button
             key={s.id}
             type="button"
             onClick={() => setElegidaId(s.id)}
-            className={`btn btn-sm ${s.id === local.id ? "btn-dark" : "btn-outline-secondary"}`}
+            aria-pressed={s.id === local.id}
+            className={`mapa-sucursal-btn ${s.id === local.id ? "activo" : ""}`}
           >
+            <FaMapMarkerAlt aria-hidden="true" />
             {s.nombre}
           </button>
         ))}
       </div>
 
-      <div className="ratio ratio-16x9 rounded-3 overflow-hidden shadow-sm">
+      <div className="ratio ratio-16x9 mapa-marco">
         <iframe
           title={`Mapa de Perfectanias en ${local.nombre}`}
           src={mapaSrc}
@@ -48,15 +52,15 @@ export const UbicacionMapa = () => {
         />
       </div>
 
-      <p className="text-center small text-muted mt-2 mb-1">{local.direccion}</p>
+      <p className="mapa-direccion text-center mt-3 mb-2">{local.direccion}</p>
       <div className="text-center">
         <a
           href={linkComoLlegar}
           target="_blank"
           rel="noreferrer"
-          className="small fw-bold text-decoration-none"
-          style={{ color: "#d4a3b8" }}
+          className="mapa-como-llegar"
         >
+          <FaRoute aria-hidden="true" />
           Cómo llegar
         </a>
       </div>
