@@ -1,8 +1,11 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useTurno } from "../../context/TurnoContext";
 import { Container, Form, Button, Row, Col, Spinner } from "react-bootstrap";
 
 export const FormularioCliente = () => {
     const { datosCliente, setDatosCliente, finalizarReserva, setPaso, loading } = useTurno();
+    const [aceptaTerminos, setAceptaTerminos] = useState(false);
 
     const elInputCambio = (e) => {
         const { name, value } = e.target;
@@ -15,6 +18,11 @@ export const FormularioCliente = () => {
         // Validación express de campos obligatorios
         if (!datosCliente.nombre.trim() || !datosCliente.apellido.trim() || !datosCliente.telefono.trim()) {
             alert("Por favor completa los campos obligatorios (Nombre, Apellido y Teléfono)");
+            return;
+        }
+
+        if (!aceptaTerminos) {
+            alert("Para confirmar el turno tenés que aceptar los Términos y condiciones y la Política de cancelación.");
             return;
         }
 
@@ -72,13 +80,44 @@ export const FormularioCliente = () => {
                     </Col>
                 </Row>
 
+                {/* ACEPTACIÓN DE TÉRMINOS Y AVISO DE PRIVACIDAD */}
+                <div className="mt-4 p-3 rounded-3" style={{ backgroundColor: "#fff7fa", border: "1px solid #f1e3e9" }}>
+                    <Form.Check
+                        id="acepta-terminos"
+                        type="checkbox"
+                        checked={aceptaTerminos}
+                        onChange={(e) => setAceptaTerminos(e.target.checked)}
+                        required
+                        label={
+                            <span className="small">
+                                Leí y acepto los{" "}
+                                <Link to="/legales/terminos" target="_blank" style={{ color: "#bd829d", fontWeight: 600 }}>
+                                    Términos y condiciones
+                                </Link>{" "}
+                                y la{" "}
+                                <Link to="/legales/cancelacion" target="_blank" style={{ color: "#bd829d", fontWeight: 600 }}>
+                                    Política de cancelación
+                                </Link>
+                                . *
+                            </span>
+                        }
+                    />
+                    <p className="text-muted mt-2 mb-0" style={{ fontSize: "12px" }}>
+                        Usamos tus datos solo para gestionar tu turno y contactarte sobre él. Más info en la{" "}
+                        <Link to="/legales/privacidad" target="_blank" style={{ color: "#bd829d" }}>
+                            Política de privacidad
+                        </Link>
+                        .
+                    </p>
+                </div>
+
                 {/* Botones de acción final dentro del formulario */}
                 <div className="d-flex justify-content-between mt-4 border-top pt-3">
                     <Button type="button" variant="outline-secondary" className="fw-bold px-4 rounded-pill text-dark" onClick={() => setPaso(4)} disabled={loading} style={{ borderColor: "#d4a3b8" }}>
                         Volver
                     </Button>
 
-                    <Button type="submit" className="fw-bold px-5 rounded-pill border-0 shadow-sm" style={{ backgroundColor: "#d4a3b8", color: "#ffffff" }} disabled={loading}>
+                    <Button type="submit" className="fw-bold px-5 rounded-pill border-0 shadow-sm" style={{ backgroundColor: "#d4a3b8", color: "#ffffff" }} disabled={loading || !aceptaTerminos}>
                         {loading ? (
                             <>
                                 <Spinner animation="border" size="sm" className="me-2" />

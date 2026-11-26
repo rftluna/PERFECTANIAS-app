@@ -21,7 +21,7 @@ export const UbicacionMapa = () => {
   const linkComoLlegar = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(local.direccion)}`;
 
   return (
-    <section className="container py-4">
+    <section id="donde-estamos" className="container py-4" style={{ scrollMarginTop: "80px" }}>
       <h5 className="mapa-titulo text-center mb-3">
         Dónde estamos
       </h5>

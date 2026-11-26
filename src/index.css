@@ -144,3 +144,14 @@ body {
     height: 100%;
     object-fit: cover;
 }
+
+/* Casillas de verificación en rosa (aceptación de términos) */
+.form-check-input:checked {
+    background-color: #d4a3b8;
+    border-color: #d4a3b8;
+}
+
+.form-check-input:focus {
+    border-color: #d4a3b8;
+    box-shadow: 0 0 0 0.2rem rgba(212, 163, 184, 0.25);
+}

@@ -20,6 +20,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute/ProtectedRoute";
 // El panel y el login se descargan solo cuando alguien entra a /admin (las clientas no los bajan).
 const AdminServicios = lazy(() => import("./components/AdminServicios/AdminServicios").then((m) => ({ default: m.AdminServicios })));
 const Login = lazy(() => import("./components/Login/Login").then((m) => ({ default: m.Login })));
+const PaginaLegal = lazy(() => import("./components/Legales/PaginaLegal").then((m) => ({ default: m.PaginaLegal })));
 const RegistroAdmin = lazy(() => import("./components/RegistroAdmin/RegistroAdmin").then((m) => ({ default: m.RegistroAdmin })));
 
 const CargandoPagina = () => <p className="text-center text-muted py-5">Cargando...</p>;
@@ -42,6 +43,9 @@ function App() {
                         <Route path="/" element={<ReservaDashboard />} />
                         <Route path="/category/:category" element={<ReservaDashboard />} />
                         <Route path="/turnos" element={<ReservaDashboard />} />
+
+                        {/* PÁGINAS LEGALES: términos, privacidad, cancelación y botón de arrepentimiento */}
+                        <Route path="/legales/:documento" element={<PaginaLegal />} />
 
                         {/* LOGIN ADMINISTRATIVO */}
                         <Route path="/admin/login" element={<Login />} />

@@ -9,6 +9,7 @@ import { ReservasAdmin } from "./ReservasAdmin";
 import { ResenasAdmin } from "./ResenasAdmin";
 import { AccesoAdmin } from "./AccesoAdmin";
 import { EquipoAdmin } from "./EquipoAdmin";
+import { LegalesAdmin } from "./LegalesAdmin";
 import { FotoServicio } from "../IlustracionServicio/IlustracionServicio";
 import { CATEGORIA_POR_DEFECTO, DURACION_POR_DEFECTO, ORDENES, SECCIONES, SECCION_POR_DEFECTO, categoriasDe, duracionDe, limpiarCategoria, normalizarCategoria, ordenarServicios, seccionDe } from "../../utils/servicios";
 
@@ -174,6 +175,7 @@ export const AdminServicios = () => {
                     { id: "servicios", texto: "💅 Servicios" },
                     { id: "resenas", texto: "⭐ Reseñas" },
                     { id: "equipo", texto: "👭 Equipo" },
+                    { id: "legales", texto: "📄 Legales" },
                     { id: "acceso", texto: "🔐 Acceso" }
                 ].map((tab) => (
                     <button
@@ -198,6 +200,8 @@ export const AdminServicios = () => {
                 <ResenasAdmin />
             ) : seccion === "equipo" ? (
                 <EquipoAdmin />
+            ) : seccion === "legales" ? (
+                <LegalesAdmin />
             ) : seccion === "acceso" ? (
                 <AccesoAdmin />
             ) : (
