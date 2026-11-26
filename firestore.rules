@@ -5,10 +5,13 @@ service cloud.firestore {
 
     // ---------- FUNCIONES AUXILIARES ----------
 
-    // Solo la cuenta de la administradora (por UID: sigue valiendo aunque cambie email o clave).
+    // Cuentas administradoras (por UID: siguen valiendo aunque cambien email o clave).
+    // Tiene que coincidir con la lista ADMIN_UIDS de src/config/admins.js.
     function esAdmin() {
       return request.auth != null
-        && request.auth.uid == 'OgWsAMKDYgQN8AhgDwjSvIzfjq72';
+        && request.auth.uid in [
+          'OgWsAMKDYgQN8AhgDwjSvIzfjq72' // Dueña
+        ];
     }
 
     function textoValido(valor, maximo) {

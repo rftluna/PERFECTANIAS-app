@@ -1,9 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { esCuentaAdmin } from "../../config/admins";
 
-// UID de la cuenta de la administradora (el mismo que usan las reglas de Firestore).
-// No cambia aunque ella cambie su correo o su contraseña.
-export const ADMIN_UID = "OgWsAMKDYgQN8AhgDwjSvIzfjq72";
 
 export const ProtectedRoute = ({ children }) => {
   const { user, loading, logout } = useAuth();
@@ -13,8 +11,8 @@ export const ProtectedRoute = ({ children }) => {
 
   if (!user) return <Navigate to="/admin/login" replace />;
 
-  // Hay sesión, pero no es la cuenta de la administradora: no se muestra el panel.
-  if (user.uid !== ADMIN_UID) {
+  // Hay sesión, pero no es una de las cuentas administradoras: no se muestra el panel.
+  if (!esCuentaAdmin(user)) {
     return (
       <div className="container py-5 text-center" style={{ maxWidth: "420px" }}>
         <h5 className="fw-bold mb-2" style={{ color: "#c47d9d" }}>Sin acceso</h5>
