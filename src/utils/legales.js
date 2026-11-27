@@ -36,7 +36,8 @@ export const DOCUMENTOS_LEGALES = [
     { id: "terminos", titulo: "Términos y condiciones" },
     { id: "privacidad", titulo: "Política de privacidad" },
     { id: "cancelacion", titulo: "Política de cancelación" },
-    { id: "arrepentimiento", titulo: "Botón de arrepentimiento" }
+    { id: "arrepentimiento", titulo: "Botón de arrepentimiento" },
+    { id: "creditos", titulo: "Licencias y créditos" }
 ];
 
 export const linkWhatsAppLocal = (numero, texto = "") => {

@@ -40,7 +40,7 @@ const AvisoCookies = () => {
     return (
         <div className="aviso-cookies" role="region" aria-label="Aviso de cookies">
             <p>
-                Al navegar este sitio aceptás el uso de cookies y almacenamiento del navegador para que funcione correctamente. <Link to="/legales/privacidad">Más información</Link>
+                No usamos cookies de publicidad ni de seguimiento: solo guardamos en tu navegador lo necesario para que el sitio funcione. <Link to="/legales/privacidad">Más información</Link>
             </p>
             <button type="button" onClick={aceptar}>
                 Entendido

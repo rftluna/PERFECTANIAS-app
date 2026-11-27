@@ -12,6 +12,8 @@ const SUCURSALES = [
 export const UbicacionMapa = () => {
   const { sucursal } = useTurno();
   const [elegidaId, setElegidaId] = useState(null);
+  // El mapa de Google se carga recién cuando la persona lo pide (no recibe la visita ni deja cookies antes).
+  const [verMapa, setVerMapa] = useState(false);
 
   // Si el usuario eligió una sucursal en el mapa, esa manda; si no, la del contexto; si no, la primera.
   const idActiva = elegidaId ?? sucursal?.id;
@@ -42,14 +44,24 @@ export const UbicacionMapa = () => {
       </div>
 
       <div className="ratio ratio-16x9 mapa-marco">
-        <iframe
-          title={`Mapa de Perfectanias en ${local.nombre}`}
-          src={mapaSrc}
-          style={{ border: 0 }}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          allowFullScreen
-        />
+        {verMapa ? (
+          <iframe
+            title={`Mapa de Perfectanias en ${local.nombre}`}
+            src={mapaSrc}
+            style={{ border: 0 }}
+            loading="lazy"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
+        ) : (
+          <div className="d-flex flex-column align-items-center justify-content-center text-center p-3" style={{ backgroundColor: "#fff7fa" }}>
+            <button type="button" onClick={() => setVerMapa(true)} className="mapa-sucursal-btn activo">
+              <FaMapMarkerAlt aria-hidden="true" />
+              Ver mapa
+            </button>
+            <small className="text-muted mt-2">El mapa lo muestra Google Maps, que puede usar sus propias cookies.</small>
+          </div>
+        )}
       </div>
 
       <p className="mapa-direccion text-center mt-3 mb-2">{local.direccion}</p>
