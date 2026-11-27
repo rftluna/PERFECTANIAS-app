@@ -125,6 +125,23 @@
     outline-offset: 3px;
 }
 
+/* Aviso de reCAPTCHA: reemplaza al distintivo flotante de Google (que taparía el botón de
+   WhatsApp). Google permite ocultarlo si este texto se ve en el sitio. */
+.footer-recaptcha {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: 11px;
+}
+
+.footer-recaptcha a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.grecaptcha-badge {
+    visibility: hidden;
+}
+
 /* Botón flotante de WhatsApp */
 .whatsapp-flotante {
     position: fixed;

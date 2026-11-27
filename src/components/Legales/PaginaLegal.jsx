@@ -142,18 +142,27 @@ const Privacidad = ({ d }) => (
                 <li>
                     <strong>Agendamas</strong>: mostramos las opiniones públicas que las clientas dejan en nuestra página de Agendamas.
                 </li>
+                <li>
+                    <strong>Google reCAPTCHA</strong>: protege las reservas, las opiniones y el acceso al panel contra bots. Para eso analiza datos técnicos de tu navegador y de cómo usás la página (por ejemplo, la dirección IP),
+                    según la{" "}
+                    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+                        Política de privacidad de Google
+                    </a>
+                    .
+                </li>
             </ul>
             <p>Estos servicios pueden almacenar datos fuera de la Argentina. Conservamos los datos de turnos mientras sean necesarios para la atención y para cumplir obligaciones legales.</p>
             <p>
-                <strong>Cómo los protegemos:</strong> conexión cifrada (HTTPS), reglas de acceso en la base de datos (las reservas solo las ven las administradoras), contraseñas seguras, bloqueo por intentos fallidos y cierre de
-                sesión automático en el panel.
+                <strong>Cómo los protegemos:</strong> conexión cifrada (HTTPS), reglas de acceso en la base de datos (las reservas solo las ven las administradoras), verificación de que los pedidos vienen de este sitio
+                (Firebase App Check), contraseñas seguras, bloqueo por intentos fallidos y cierre de sesión automático en el panel.
             </p>
         </Seccion>
 
         <Seccion titulo="5. Cookies y almacenamiento del navegador">
             <p>
                 El sitio guarda en tu navegador información técnica necesaria para funcionar: la sesión del panel de administración, el aviso de cookies y si ya enviaste una opinión. No usamos cookies de publicidad ni de
-                seguimiento. El mapa de Google se carga solo si tocás &ldquo;Ver mapa&rdquo;; en ese caso Google puede usar sus propias cookies.
+                seguimiento. Google reCAPTCHA usa una cookie técnica de seguridad para distinguir personas de bots. El mapa de Google se carga solo si tocás &ldquo;Ver mapa&rdquo;; en ese caso Google puede usar sus propias
+                cookies.
             </p>
         </Seccion>
 

@@ -1,5 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
@@ -23,6 +24,23 @@ const firebaseConfig = {
 };
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// App Check: Firestore y el login solo aceptan pedidos que vienen de este sitio
+// (no de scripts o bots que copien la configuración de arriba). La clave del sitio
+// de reCAPTCHA es pública; la protección real se activa en Firebase → App Check.
+const siteKeyRecaptcha = (import.meta.env.VITE_RECAPTCHA_SITE_KEY || "").trim();
+export const appCheckActivo = Boolean(siteKeyRecaptcha);
+
+if (appCheckActivo) {
+    if (import.meta.env.DEV) {
+        // En la compu (npm run dev) se usa un token de prueba registrado en la consola de Firebase.
+        self.FIREBASE_APPCHECK_DEBUG_TOKEN = (import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || "").trim() || true;
+    }
+    initializeAppCheck(app, {
+        provider: new ReCaptchaEnterpriseProvider(siteKeyRecaptcha),
+        isTokenAutoRefreshEnabled: true
+    });
+}
 
 const db = getFirestore(app);
 

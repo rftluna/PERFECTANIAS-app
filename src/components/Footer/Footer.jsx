@@ -4,6 +4,7 @@ import { BsWhatsapp } from "react-icons/bs";
 import { FaInstagram, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
 import { DOCUMENTOS_LEGALES, linkWhatsAppLocal } from "../../utils/legales";
 import { useDatosLegales } from "../../utils/useDatosLegales";
+import { appCheckActivo } from "../../firebase/config";
 import "./Footer.css";
 
 const NAVEGACION = [
@@ -132,6 +133,13 @@ export const Footer = () => {
                     <Link to="/legales/arrepentimiento" className="footer-arrepentimiento">
                         Botón de arrepentimiento
                     </Link>
+                    {appCheckActivo && (
+                        <p className="footer-recaptcha">
+                            Este sitio está protegido por reCAPTCHA y se aplican la{" "}
+                            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Política de privacidad</a> y las{" "}
+                            <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Condiciones del servicio</a> de Google.
+                        </p>
+                    )}
                 </div>
             </footer>
 
