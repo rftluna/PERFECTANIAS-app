@@ -34,6 +34,7 @@ export const CalendarioTurnos = () => {
         const inicioTurno = new Date();
         inicioTurno.setHours(hh, mm, 0, 0);
 
+        // eslint-disable-next-line react-hooks/purity -- la hora actual define qué turnos ya pasaron
         return inicioTurno.getTime() - Date.now() < 60 * 60 * 1000;
     };
 
@@ -59,6 +60,7 @@ export const CalendarioTurnos = () => {
     // Consultamos exclusivamente la colección disponibilidad.
     useEffect(() => {
         if (!fechaSeleccionada || !sucursal?.id || !db) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect -- sin fecha o sucursal se limpia el estado
             setHorasOcupadas({});
             setErrorHorarios(false);
             setLoadingHorarios(false);

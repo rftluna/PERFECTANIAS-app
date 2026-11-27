@@ -56,6 +56,7 @@ export const TurnoProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de datos
         cargarServicios();
     }, [cargarServicios]);
 
