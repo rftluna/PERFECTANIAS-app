@@ -1,0 +1,26 @@
+# Verificación automática en cada PR y en cada cambio a main:
+# lint, compilación y auditoría de dependencias (falla con vulnerabilidades altas o críticas).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm audit --audit-level=high

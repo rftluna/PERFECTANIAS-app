@@ -1,0 +1,23 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    # Paquetes que tienen que actualizarse juntos
+    groups:
+      react:
+        patterns: ["react", "react-dom", "@types/react", "@types/react-dom"]
+      vite:
+        patterns: ["vite", "@vitejs/*"]
+      eslint:
+        patterns: ["eslint", "@eslint/*", "eslint-plugin-*", "globals"]
+    ignore:
+      # Firebase 13 exige Node 24.12+: revisar a mano antes de pasar de versión mayor
+      - dependency-name: "firebase"
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"

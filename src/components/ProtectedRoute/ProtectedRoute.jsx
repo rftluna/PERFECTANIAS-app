@@ -1,9 +1,12 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useCierreInactividad } from "../../utils/useCierreInactividad";
 
 
 export const ProtectedRoute = ({ children }) => {
   const { user, loading, esAdmin, logout } = useAuth();
+  // El panel se cierra solo después de 30 minutos sin actividad.
+  useCierreInactividad(Boolean(user && esAdmin), logout);
 
   // Esperamos a saber si hay usuario antes de redirigir.
   if (loading) return <p className="text-center text-muted py-5">Cargando...</p>;
