@@ -76,6 +76,9 @@ export const FormularioCliente = () => {
                                 value={datosCliente.notas}
                                 onChange={elInputCambio}
                             />
+                            <Form.Text className="text-muted" style={{ fontSize: "11px" }}>
+                                Si anotás datos de salud (por ejemplo, una alergia), los usamos solo para cuidarte durante el servicio y únicamente los ven las administradoras.
+                            </Form.Text>
                         </Form.Group>
                     </Col>
                 </Row>

@@ -1,0 +1,23 @@
+# Escaneo de seguridad del sitio publicado con OWASP ZAP (modo "baseline": pasivo, no ataca).
+# Corre todos los lunes y a mano desde GitHub → Actions → "Escaneo OWASP ZAP" → Run workflow.
+# El informe queda como archivo descargable (artifact "zap_scan") en cada ejecución.
+name: Escaneo OWASP ZAP
+
+on:
+  schedule:
+    - cron: "17 9 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  zap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: zaproxy/action-baseline@v0.15.0
+        with:
+          target: "https://perfectanias.vercel.app"
+          allow_issue_writing: false
+          fail_action: false

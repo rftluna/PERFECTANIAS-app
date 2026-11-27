@@ -28,6 +28,13 @@ documentada que pide una auditoría.
 15. **Dependencias sin vulnerabilidades** (`npm audit`: 0) y **Dependabot** semanal con grupos.
 16. **Scripts de instalación aprobados uno por uno** (`allowScripts` en package.json, npm 12+).
 17. **CI** (`.github/workflows/ci.yml`): lint, build y `npm audit` en cada PR.
+18. **Escaneo semanal OWASP ZAP** (`.github/workflows/zap.yml`) del sitio publicado.
+
+## Privacidad (ISO 27701 · Ley 25.326)
+19. **Política de privacidad** con responsable, datos, finalidades, proveedores (Firebase, EmailJS, Vercel, Google Maps, Agendamas), medidas de seguridad, plazos de respuesta y derechos.
+20. **Datos de salud** (notas de la reserva) tratados como datos sensibles: aviso en el formulario y uso limitado a la atención.
+21. **Mapa de Google a pedido** ("Ver mapa"): Google no recibe la visita ni deja cookies sin una acción de quien navega.
+22. **Licencias y créditos** (`/legales/creditos`), con la atribución que exige Font Awesome (CC BY 4.0).
 
 ## Pendientes que se configuran fuera del código
 - **Firebase App Check** (reCAPTCHA Enterprise) para frenar reservas o reseñas falsas automatizadas.

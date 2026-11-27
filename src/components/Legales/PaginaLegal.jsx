@@ -111,7 +111,7 @@ const Privacidad = ({ d }) => (
                 <li>No pedimos datos de tarjetas: la seña se paga por transferencia bancaria.</li>
             </ul>
             <p>
-                En las notas solo incluí información necesaria para atenderte (por ejemplo, una alergia). Esa información se usa únicamente para cuidar tu salud durante el servicio.
+                En las notas solo incluí información necesaria para atenderte (por ejemplo, una alergia). Los datos de salud son datos sensibles (art. 2 y 7, Ley 25.326): si los escribís, consentís que los usemos únicamente para cuidar tu salud durante el servicio, y solo los ven las administradoras.
             </p>
         </Seccion>
 
@@ -137,23 +137,30 @@ const Privacidad = ({ d }) => (
                     <strong>Vercel</strong>: alojamiento del sitio.
                 </li>
                 <li>
-                    <strong>Google Maps</strong>: mapa de las sucursales.
+                    <strong>Google Maps</strong>: mapa de las sucursales (se carga solo si tocás &ldquo;Ver mapa&rdquo;).
+                </li>
+                <li>
+                    <strong>Agendamas</strong>: mostramos las opiniones públicas que las clientas dejan en nuestra página de Agendamas.
                 </li>
             </ul>
             <p>Estos servicios pueden almacenar datos fuera de la Argentina. Conservamos los datos de turnos mientras sean necesarios para la atención y para cumplir obligaciones legales.</p>
+            <p>
+                <strong>Cómo los protegemos:</strong> conexión cifrada (HTTPS), reglas de acceso en la base de datos (las reservas solo las ven las administradoras), contraseñas seguras, bloqueo por intentos fallidos y cierre de
+                sesión automático en el panel.
+            </p>
         </Seccion>
 
         <Seccion titulo="5. Cookies y almacenamiento del navegador">
             <p>
-                El sitio guarda en tu navegador información técnica necesaria para funcionar: la sesión del panel de administración, el aviso de cookies aceptado y si ya enviaste una opinión. El mapa de Google puede usar sus propias
-                cookies. No usamos cookies de publicidad.
+                El sitio guarda en tu navegador información técnica necesaria para funcionar: la sesión del panel de administración, el aviso de cookies y si ya enviaste una opinión. No usamos cookies de publicidad ni de
+                seguimiento. El mapa de Google se carga solo si tocás &ldquo;Ver mapa&rdquo;; en ese caso Google puede usar sus propias cookies.
             </p>
         </Seccion>
 
         <Seccion titulo="6. Tus derechos">
             <p>
                 Podés pedir acceso, rectificación, actualización o supresión de tus datos escribiendo a <Dato valor={d.email} nombre="email" />. El derecho de acceso puede ejercerse en forma gratuita a intervalos no inferiores a
-                seis meses, salvo interés legítimo (art. 14, inc. 3, Ley 25.326).
+                seis meses, salvo interés legítimo (art. 14, inc. 3, Ley 25.326). Respondemos los pedidos de acceso en hasta 10 días corridos y los de rectificación o supresión en hasta 5 días hábiles.
             </p>
             <p className="legal-leyenda">
                 La AGENCIA DE ACCESO A LA INFORMACIÓN PÚBLICA, en su carácter de Órgano de Control de la Ley N° 25.326, tiene la atribución de atender las denuncias y reclamos que interpongan quienes resulten afectados en sus derechos
@@ -293,7 +300,31 @@ const Arrepentimiento = ({ d }) => {
     );
 };
 
-const CONTENIDO = { terminos: Terminos, privacidad: Privacidad, cancelacion: Cancelacion, arrepentimiento: Arrepentimiento };
+// ---------- LICENCIAS Y CRÉDITOS ----------
+const Creditos = () => (
+    <>
+        <Seccion titulo="Íconos">
+            <p>
+                Íconos de <strong>Font Awesome Free</strong> de Fonticons, Inc. (licencia <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>) y de{" "}
+                <strong>Bootstrap Icons</strong> (licencia MIT), a través de react-icons.
+            </p>
+        </Seccion>
+        <Seccion titulo="Imágenes">
+            <p>
+                Las fotos de los servicios son de Perfectanias. Las fotos de referencia son de <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer">Unsplash</a> (licencia Unsplash: uso libre, incluso comercial) y
+                muestran el crédito de su autora o autor en cada servicio.
+            </p>
+        </Seccion>
+        <Seccion titulo="Software">
+            <p>
+                React, React Router, React Bootstrap, Bootstrap, react-toastify y Vite (licencia MIT), Firebase (Apache 2.0) y EmailJS (BSD 3-Clause), entre otras librerías de código abierto con licencias MIT, Apache 2.0, BSD e
+                ISC.
+            </p>
+        </Seccion>
+    </>
+);
+
+const CONTENIDO = { terminos: Terminos, privacidad: Privacidad, cancelacion: Cancelacion, arrepentimiento: Arrepentimiento, creditos: Creditos };
 
 export const PaginaLegal = () => {
     const { documento } = useParams();
