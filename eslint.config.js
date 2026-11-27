@@ -1,29 +1,25 @@
 import js from '@eslint/js'
 import globals from 'globals'
-import react from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
+// ESLint 10 ya reconoce las variables usadas en JSX, así que no hace falta
+// eslint-plugin-react (que todavía no es compatible con ESLint 10).
 export default defineConfig([
   globalIgnores(['dist']),
   {
     files: ['**/*.{js,jsx}'],
     extends: [
       js.configs.recommended,
-      react.configs.flat.recommended,
-      react.configs.flat['jsx-runtime'],
-      reactHooks.configs['recommended-latest'],
+      reactHooks.configs.flat['recommended-latest'],
       reactRefresh.configs.vite,
     ],
     languageOptions: {
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
-    settings: { react: { version: 'detect' } },
     rules: {
-      // El proyecto no usa PropTypes.
-      'react/prop-types': 'off',
       // Contextos y helpers exportan hooks junto al Provider: es intencional.
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true, allowExportNames: ['useAuth', 'useTurno'] }],
     },

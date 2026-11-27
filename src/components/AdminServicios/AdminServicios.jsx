@@ -56,6 +56,7 @@ export const AdminServicios = () => {
 
     useEffect(() => {
         if (usuario) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de datos
             cargarServicios();
         }
     }, [usuario]);

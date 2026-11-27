@@ -80,6 +80,7 @@ export const ReservasAdmin = () => {
     };
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- carga inicial de datos
         cargarReservas();
     }, []);
 
